@@ -36,9 +36,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ESP8266 v1.11
-        run: |
-          touch esp8266/modules/ex.py
-          docker build --build-arg BRANCH="v1.11" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266 ./esp8266
+        run: docker build --build-arg BRANCH="v1.11" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266 ./esp8266
 
       - name: Publish Image
         run: docker push docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266
