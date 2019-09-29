@@ -37,7 +37,7 @@ jobs:
 
       - name: Copy Firmware
         run: |
-          docker run --name ${{ matrix.args.name }} -it ${{ matrix.args.tag }} find /micropython/ports/esp32/build -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
+          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/ports/esp32/build -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
           docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
           docker rm ${{ matrix.args.name }}
 
