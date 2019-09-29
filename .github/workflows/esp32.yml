@@ -1,0 +1,49 @@
+name: Build ESP32
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'esp32/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        args:
+          - name: micropython
+            repo: micropython/micropython
+            branch: v1.11
+            idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
+            tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32
+          - name: pycopy
+            repo: pfalcon/pycopy
+            branch: v2.11.0.10
+            idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycopy:v2.11.0.10-esp32
+    steps:
+      - uses: actions/checkout@master
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build ${{ matrix.args.name }} ESP32
+        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --tag ${{ matrix.args.tag }} ./esp32
+
+      - name: Copy Firmware
+        run: |
+          docker run --rm -it ${{ matrix.args.tag }} find /micropython/ports/esp32/build -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
+          docker cp ${{ matrix.args.tag }}:/firmware.bin ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+
+      - name: Upload Firmware Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+          path: ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+
+      - name: Publish Image
+        run: docker push ${{ matrix.args.tag }}
