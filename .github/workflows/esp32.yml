@@ -37,13 +37,14 @@ jobs:
 
       - name: Copy Firmware
         run: |
-          docker run --rm -it ${{ matrix.args.tag }} find /micropython/ports/esp32/build -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
-          docker cp ${{ matrix.args.tag }}:/firmware.bin ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+          docker run -name ${{ matrix.args.name }} -it ${{ matrix.args.tag }} find /micropython/ports/esp32/build -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
+          docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+          docker rm ${{ matrix.args.name }}
 
       - name: Upload Firmware Artifact
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
+          name: ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32
           path: ${{ matrix.args.name }}:${{ matrix.args.branch }}-esp32.bin
 
       - name: Publish Image
