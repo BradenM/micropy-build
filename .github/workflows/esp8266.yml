@@ -1,0 +1,34 @@
+name: Build ESP8266
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'esp8266/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        args:
+          - name: micropython
+            repo: micropython/micropython
+            branch: v1.11
+            tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: textbook/git-checkout-submodule-action@2.0.0
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build ${{ matrix.args.name }} ESP8266
+        run: docker build --build-arg BRANCH="${{ matrix.args.branch }}" --tag ${{ matrix.args.tag }} ./esp8266
+
+      - name: Publish Image
+        run: docker push ${{ matrix.args.tag }}
