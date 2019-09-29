@@ -31,5 +31,17 @@ jobs:
       - name: Build ${{ matrix.args.name }} ESP8266
         run: docker build --build-arg BRANCH="${{ matrix.args.branch }}" --tag ${{ matrix.args.tag }} ./esp8266
 
+      - name: Copy Firmware
+        run: |
+          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/ports/esp8266/ -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
+          docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266.bin
+          docker rm ${{ matrix.args.name }}
+
+      - name: Upload Firmware Artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
+          path: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266.bin
+
       - name: Publish Image
         run: docker push ${{ matrix.args.tag }}
