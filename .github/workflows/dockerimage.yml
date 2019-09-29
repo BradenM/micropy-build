@@ -6,14 +6,36 @@ on:
       - master
 
 jobs:
-  build:
+  esp32:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@master
-      - name: Build ESP32 v1.11
-        run: docker build --build-arg BRANCH="v1.11" --build-arg IDF="5c88c5996dbde6208e3bec05abc21ff6cd822d26" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32 ./esp32
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - name: Build ESP32 v1.11
+        run: |
+          docker build --build-arg BRANCH="v1.11" --build-arg IDF="5c88c5996dbde6208e3bec05abc21ff6cd822d26" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32 ./esp32
+          docker push docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32
+
+  esp8266:
+    runs-on: ubuntu-latest
+
+    steps:
       - uses: actions/checkout@master
+      - uses: textbook/git-checkout-submodule-action@2.0.0
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - name: Build ESP8266 v1.11
-        run: docker build --build-arg BRANCH="v1.11" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266 ./esp8266
+        run: |
+          touch esp8266/modules/ex.py
+          docker build --build-arg BRANCH="v1.11" --tag docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266 ./esp8266
+          docker push docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266
