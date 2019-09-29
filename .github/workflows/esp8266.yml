@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'esp8266/*'
+      - '.github/workflows/esp8266.yml'
 
 jobs:
   build:
