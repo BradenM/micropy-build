@@ -46,5 +46,5 @@ if [ "${GITHUB_REF}" = "refs/heads/master" ]; then
 fi
 
 # Set Outputs
-echo ::set-output binaries=BINARIES::$BINARIES
-echo ::set-output tag=DOCKER_TAG::$DOCKER_TAG
+echo ::set-output name=binaries::$BINARIES
+echo ::set-output name=tag::$DOCKER_TAG
