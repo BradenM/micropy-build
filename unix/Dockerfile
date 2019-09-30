@@ -19,6 +19,7 @@ RUN git clone $REPO micropython \
     && git submodule update --init --recursive
 
 # Build Deps & Tools
+RUN alias python='python3'
 RUN cd micropython/ports/unix && make deplibs
 RUN cd micropython/mpy-cross && make
 
