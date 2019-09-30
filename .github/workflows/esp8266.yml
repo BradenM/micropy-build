@@ -7,6 +7,10 @@ on:
     paths:
       - 'esp8266/*'
       - '.github/workflows/esp8266.yml'
+  pull_request:
+    paths:
+      - 'esp8266/*'
+      - '.github/workflows/esp8266.yml'
 
 jobs:
   build:
@@ -48,4 +52,5 @@ jobs:
           path: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266.bin
 
       - name: Publish Image
+        if: github.event_name != 'pull_request'
         run: docker push ${{ matrix.args.tag }}

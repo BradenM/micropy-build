@@ -7,6 +7,10 @@ on:
     paths:
       - 'unix/*'
       - '.github/workflows/unix.yml'
+  pull_request:
+    paths:
+      - 'unix/*'
+      - '.github/workflows/unix.yml'
 
 jobs:
   build:
@@ -48,4 +52,5 @@ jobs:
           path: ${{ matrix.args.name }}
 
       - name: Publish Image
+        if: github.event_name != 'pull_request'
         run: docker push ${{ matrix.args.tag }}

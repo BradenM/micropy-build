@@ -52,4 +52,5 @@ jobs:
           path: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32.bin
 
       - name: Publish Image
+        if: github.event_name != 'pull_request'
         run: docker push ${{ matrix.args.tag }}
