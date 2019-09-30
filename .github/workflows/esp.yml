@@ -1,16 +1,18 @@
-name: Build ESP32
+name: Build ESP
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'esp32/*'
-      - '.github/workflows/esp32.yml'
+      - 'esp*/*'
+      - '.github/workflows/esp.yml'
+      - 'actions/**/*'
   pull_request:
     paths:
-      - 'esp32/*'
-      - '.github/workflows/esp32.yml'
+      - 'esp*/*'
+      - '.github/workflows/esp.yml'
+      - 'actions/**/*'
 
 jobs:
   build_micropython:
@@ -21,6 +23,7 @@ jobs:
         name: [micropython]
         repo: ['https://github.com/micropython/micropython.git']
         branch: [v1.11, v1.10]
+        port: [esp32, esp8266]
         include:
           - branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
@@ -29,8 +32,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
+      - uses: textbook/git-checkout-submodule-action@2.0.0
 
-      - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
+      - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
         uses: ./actions/build-micropython
         with:
@@ -38,7 +42,8 @@ jobs:
           repo: ${{ matrix.repo }}
           branch: ${{ matrix.branch }}
           idf: ${{ matrix.idf }}
-          path: ./esp32
+          port: ${{ matrix.port }}
+          path: ./${{ matrix.port }}
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}
@@ -57,14 +62,16 @@ jobs:
         name: [pycopy]
         repo: ['https://github.com/pfalcon/pycopy.git']
         branch: [v2.11.0.10]
+        port: [esp32, esp8266]
         include:
           - branch: v2.11.0.10
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
 
     steps:
       - uses: actions/checkout@master
+      - uses: textbook/git-checkout-submodule-action@2.0.0
 
-      - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
+      - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
         uses: ./actions/build-micropython
         with:
@@ -72,7 +79,8 @@ jobs:
           repo: ${{ matrix.repo }}
           branch: ${{ matrix.branch }}
           idf: ${{ matrix.idf }}
-          path: ./esp32
+          port: ${{ matrix.port }}
+          path: ./${{ matrix.port }}
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}
@@ -117,6 +125,7 @@ jobs:
             board: LOPY4
     steps:
       - uses: actions/checkout@master
+      - uses: textbook/git-checkout-submodule-action@2.0.0
 
       - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
         id: micropy-build

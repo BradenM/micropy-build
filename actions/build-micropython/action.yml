@@ -27,6 +27,10 @@ inputs:
     description: 'Path to Port relative to Repo Root'
     required: false
     default: 'ports/esp32'
+  port:
+    description: 'Port to Compile'
+    required: false
+    default: 'esp32'
   idf_repo:
     description: 'ESP IDF Repo to Use'
     required: false

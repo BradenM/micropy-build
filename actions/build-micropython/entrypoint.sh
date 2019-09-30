@@ -5,7 +5,7 @@ DOCKERFILE="$1"
 
 # Generate Docker Tag Name
 FIRMWARE_NAME="$(echo "$INPUT_NAME" | cut -d'-' -f1)"
-BOARD_NAME="$(if [ "$BOARD" != 'GENERIC' ]; then echo "$BOARD" | tr '[:upper:]' '[:lower:]'; else echo 'esp32'; fi)"
+BOARD_NAME="$(if [ "$BOARD" != 'GENERIC' ]; then echo "$BOARD" | tr '[:upper:]' '[:lower:]'; else echo "$INPUT_PORT"; fi)"
 
 # Image Info
 DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
@@ -19,6 +19,7 @@ sh -c "docker login ${INPUT_DOCKER_REGISTRY} -u ${INPUT_DOCKER_USERNAME} -p ${IN
 echo "--- BUILD CONFIG ---"
 echo "REPO: ${REPO}"
 echo "BRANCH: ${BRANCH}"
+echo "PORT: ${INPUT_PORT}"
 echo "IDF: ${IDF}"
 echo "IDF_REPO: ${IDF_REPO}"
 echo "PORT_PATH: ${PORT_PATH}"
