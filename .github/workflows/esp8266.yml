@@ -13,44 +13,62 @@ on:
       - '.github/workflows/esp8266.yml'
 
 jobs:
-  build:
+  build_micropython:
+    name: Build MicroPython
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        args:
-          - name: micropython
-            repo: micropython/micropython
-            branch: v1.11
-            tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp8266
-          - name: pycopy
-            repo: pfalcon/pycopy
-            branch: v2.11.0.10
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycopy:v2.11.0.10-esp8266
+        name: [micropython]
+        repo: ['https://github.com/micropython/micropython.git']
+        branch: [v1.11, v1.10]
 
     steps:
       - uses: actions/checkout@master
-      - uses: textbook/git-checkout-submodule-action@2.0.0
-      - uses: azure/docker-login@v1
+
+      - name: Build ${{ matrix.name }} ESP8266 ${{ matrix.branch }}
+        id: micropy-build
+        uses: ./actions/build-micropython
         with:
-          login-server: docker.pkg.github.com
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - name: Build ${{ matrix.args.name }} ESP8266
-        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --tag ${{ matrix.args.tag }} ./esp8266
-
-      - name: Copy Binaries
-        run: |
-          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} bash -c 'mkdir -p /artifacts/ && find /micropython/${{ matrix.args.port_path || 'ports/esp8266' }}/ -path "*.bin" -exec cp {} "$_" \;'
-          docker cp ${{ matrix.args.name }}:/artifacts ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
-          docker rm ${{ matrix.args.name }}
+          name: ${{ matrix.name }}
+          repo: ${{ matrix.repo }}
+          branch: ${{ matrix.branch }}
+          path: ./esp8266
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
-          path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
+          name: ${{ steps.micropy-build.outputs.binaries }}
+          path: ./${{ steps.micropy-build.outputs.binaries }}
 
-      - name: Publish Image
-        if: github.ref == 'refs/heads/master'
-        run: docker push ${{ matrix.args.tag }}
+  build_pycopy:
+    name: Build Pycopy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        name: [pycopy]
+        repo: ['https://github.com/pfalcon/pycopy.git']
+        branch: [v2.11.0.10]
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Build ${{ matrix.name }} ESP8266 ${{ matrix.branch }}
+        id: micropy-build
+        uses: ./actions/build-micropython
+        with:
+          name: ${{ matrix.name }}
+          repo: ${{ matrix.repo }}
+          branch: ${{ matrix.branch }}
+          path: ./esp8266
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Upload Binaries
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: ${{ steps.micropy-build.outputs.binaries }}
+          path: ./${{ steps.micropy-build.outputs.binaries }}
