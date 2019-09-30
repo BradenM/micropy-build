@@ -17,11 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        args:
-          - name: micropython
-            repo: https://github.com/micropython/micropython.git
-            branch: v1.11
+        name: [micropython]
+        repo: ['https://github.com/micropython/micropython.git']
+        branch: [v1.11, v1.10]
+        include:
+          - branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
+          - branch: v1.10
+            idf: 30545f4cccec7460634b656d278782dd7151098e
 
     steps:
       - uses: actions/checkout@master
@@ -31,14 +34,14 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build ${{ matrix.args.name }} ESP32
+      - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
         id: micropy-build
         uses: ./actions/build-micropython
         with:
-          name: ${{ matrix.args.name }}
-          repo: ${{ matrix.args.repo }}
-          branch: ${{ matrix.args.branch }}
-          idf: ${{ matrix.args.idf }}
+          name: ${{ matrix.name }}
+          repo: ${{ matrix.repo }}
+          branch: ${{ matrix.branch }}
+          idf: ${{ matrix.idf }}
           path: ./esp32
 
       - name: Upload Binaries
