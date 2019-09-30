@@ -18,8 +18,9 @@ RUN git clone $REPO micropython \
     && cd micropython && git checkout $BRANCH && git pull origin $BRANCH\
     && git submodule update --init --recursive
 
-# Build Deps
+# Build Deps & Tools
 RUN cd micropython/ports/unix && make deplibs
+RUN cd micropython/mpy-cross && make
 
 # Build
 RUN cd micropython/ports/unix && make
