@@ -1,0 +1,55 @@
+# build micropython action
+name: 'Build Micropython'
+author: 'BradenM'
+description: 'Build and Publish Micropython Port'
+inputs:
+  name:
+    description: 'Firmware Name'
+    required: false
+    default: 'micropython'
+  repo:
+    description: 'Firmware Repo'
+    required: false
+    default: 'https://github.com/micropython/micropython.git'
+  branch:
+    description: 'Branch to build'
+    required: false
+    default: 'v1.11'
+  idf:
+    description: 'ESP IDF Commit Hash to Build with'
+    required: false
+    default: '5c88c5996dbde6208e3bec05abc21ff6cd822d26'
+  board:
+    description: 'Board Type to Build'
+    required: false
+    default: 'GENERIC'
+  port_path:
+    description: 'Path to Port relative to Repo Root'
+    required: false
+    default: 'ports/esp32'
+  idf_repo:
+    description: 'ESP IDF Repo to Use'
+    required: false
+    default: 'https://github.com/espressif/esp-idf.git'
+  path:
+    description: 'Path to Dockerfile'
+    required: true
+outputs:
+  binaries:
+    description: 'Path to Compiled Binaries'
+  tag:
+    description: 'Docker Tag'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  entrypoint: 'entrypoint.sh'
+  env:
+    REPO: ${{ inputs.repo }}
+    BRANCH: ${{ inputs.branch }}
+    IDF: ${{ inputs.idf }}
+    BOARD: ${{ inputs.board }}
+    PORT_PATH: ${{ inputs.port_path }}
+    IDF_REPO: ${{ inputs.idf_repo }}
+  args:
+    - ${{ inputs.path }}
