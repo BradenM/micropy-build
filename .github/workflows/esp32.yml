@@ -43,7 +43,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ${{ matrix.args.name }} ESP32
-        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --build-arg BOARD="${{ matrix.args.board || 'N' }}" --build-arg PORT_PATH="${{ matrix.args.port_path || 'ports/esp32' }}" --build-args IDF_REPO="${{ matrix.args.idf_repo || 'https://github.com/espressif/esp-idf.git' }}" --tag ${{ matrix.args.tag }} ./esp32
+        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --build-arg BOARD="${{ matrix.args.board || 'N' }}" --build-arg PORT_PATH="${{ matrix.args.port_path || 'ports/esp32' }}" --build-arg IDF_REPO="${{ matrix.args.idf_repo || 'https://github.com/espressif/esp-idf.git' }}" --tag ${{ matrix.args.tag }} ./esp32
 
       - name: Copy Firmware
         run: |
