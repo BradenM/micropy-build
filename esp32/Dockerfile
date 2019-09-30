@@ -3,13 +3,22 @@ FROM ubuntu:18.04
 LABEL maintainer="bradenmars@bradenmars.me"
 LABEL description="MicroPython ESP32 Build Dockerfile"
 
-ARG REPO=https://github.com/micropython/micropython.git
-ARG BRANCH=master
-ARG IDF=5c88c5996dbde6208e3bec05abc21ff6cd822d26
-ARG IDF_REPO=https://github.com/espressif/esp-idf.git
+# Allow Args to Override Env
+ARG REPO
+ARG BRANCH
+ARG IDF
+ARG IDF_REPO
 # Compat (Pycom Sigfox)
-ARG PORT_PATH=ports/esp32
-ARG BOARD=GENERIC
+ARG PORT_PATH
+ARG BOARD
+
+ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
+ENV BRANCH ${BRANCH:-master}
+ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
+ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
+ENV PORT_PATH ${PORT_PATH:-ports/esp32}
+ENV BOARD ${BOARD:-GENERIC}
+
 
 # Requirements
 RUN apt-get update \
