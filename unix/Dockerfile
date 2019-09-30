@@ -8,7 +8,7 @@ ARG BRANCH=master
 
 # Requirements
 RUN apt-get update \
-    && apt-get install -y build-essential libffi-dev pkg-config git autoconf libtool python3 python3-pip
+    && apt-get install -y build-essential libffi-dev pkg-config git autoconf libtool python3 python3-pip python python-pip
 
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -19,7 +19,6 @@ RUN git clone $REPO micropython \
     && git submodule update --init --recursive
 
 # Build Deps & Tools
-RUN alias python='python3'
 RUN cd micropython/ports/unix && make deplibs
 RUN cd micropython/mpy-cross && make
 
