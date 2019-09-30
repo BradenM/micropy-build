@@ -43,7 +43,6 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  entrypoint: 'entrypoint.sh'
   env:
     REPO: ${{ inputs.repo }}
     BRANCH: ${{ inputs.branch }}

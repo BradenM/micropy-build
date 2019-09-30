@@ -19,10 +19,9 @@ jobs:
       matrix:
         args:
           - name: micropython
-            repo: micropython/micropython
+            repo: https://github.com/micropython/micropython.git
             branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
-            tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32
 
     steps:
       - uses: actions/checkout@master
@@ -32,10 +31,9 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - uses: ./actions/build-micropython
       - name: Build ${{ matrix.args.name }} ESP32
         id: micropy-build
-        uses: actions/build-micropython@v1.0.0
+        uses: ./actions/build-micropython
         with:
           name: ${{ matrix.args.name }}
           repo: ${{ matrix.args.repo }}

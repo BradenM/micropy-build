@@ -12,4 +12,4 @@ LABEL "com.github.actions.description"="Build and Publish Micropython Port"
 # Setup Entrypoint
 COPY entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
