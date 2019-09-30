@@ -70,7 +70,7 @@ jobs:
             tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-fipy
           - name: pycom-lopy4
             repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
+            branch: [v1.18.3, v1.20.0.rc13]
             idf: master
             board: LOPY4
             port_path: esp32
