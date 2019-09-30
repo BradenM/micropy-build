@@ -18,6 +18,10 @@ jobs:
             repo: micropython/micropython
             branch: v1.11
             tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-unix
+          - name: pycopy
+            repo: pfalcon/pycopy
+            branch: v2.11.0.10
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycopy:v2.11.0.10-unix
 
     steps:
       - uses: actions/checkout@master
