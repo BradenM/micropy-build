@@ -101,5 +101,5 @@ jobs:
           path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
 
       - name: Publish Image
-        if: github.ref == 'master'
+        if: github.ref == 'refs/heads/master'
         run: docker push ${{ matrix.args.tag }}

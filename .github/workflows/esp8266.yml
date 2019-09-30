@@ -39,18 +39,18 @@ jobs:
       - name: Build ${{ matrix.args.name }} ESP8266
         run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --tag ${{ matrix.args.tag }} ./esp8266
 
-      - name: Copy Firmware
+      - name: Copy Binaries
         run: |
-          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/ports/esp8266/ -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
-          docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266.bin
+          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} bash -c 'mkdir -p /artifacts/ && find /micropython/${{ matrix.args.port_path || 'ports/esp8266' }}/ -path "*.bin" -exec cp {} "$_" \;'
+          docker cp ${{ matrix.args.name }}:/artifacts ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
           docker rm ${{ matrix.args.name }}
 
-      - name: Upload Firmware Artifact
+      - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
         with:
           name: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
-          path: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266.bin
+          path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp8266
 
       - name: Publish Image
-        if: github.ref == 'master'
+        if: github.ref == 'refs/heads/master'
         run: docker push ${{ matrix.args.tag }}
