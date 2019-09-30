@@ -29,11 +29,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - uses: azure/docker-login@v1
-        with:
-          login-server: docker.pkg.github.com
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
         id: micropy-build
@@ -44,6 +39,9 @@ jobs:
           branch: ${{ matrix.branch }}
           idf: ${{ matrix.idf }}
           path: ./esp32
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
@@ -65,11 +63,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - uses: azure/docker-login@v1
-        with:
-          login-server: docker.pkg.github.com
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
         id: micropy-build
@@ -80,6 +73,9 @@ jobs:
           branch: ${{ matrix.branch }}
           idf: ${{ matrix.idf }}
           path: ./esp32
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
@@ -121,11 +117,6 @@ jobs:
             board: LOPY4
     steps:
       - uses: actions/checkout@master
-      - uses: azure/docker-login@v1
-        with:
-          login-server: docker.pkg.github.com
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
         id: micropy-build
@@ -139,6 +130,9 @@ jobs:
           board: ${{ matrix.board}}
           port_path: ${{ matrix.port_path }}
           path: ./esp32
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0

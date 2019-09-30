@@ -31,6 +31,15 @@ inputs:
     description: 'ESP IDF Repo to Use'
     required: false
     default: 'https://github.com/espressif/esp-idf.git'
+  docker_username:
+    description: 'Docker Username'
+    required: true
+  docker_password:
+    description: 'Docker Password'
+    required: true
+  docker_registry:
+    description: 'Docker Registry'
+    required: true
   path:
     description: 'Path to Dockerfile'
     required: true

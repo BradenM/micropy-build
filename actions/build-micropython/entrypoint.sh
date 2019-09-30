@@ -12,6 +12,9 @@ DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
 DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}:${BRANCH}-${BOARD_NAME}"
 CONTAINER="$INPUT_NAME"
 
+# Docker Authenticate
+sh -c "docker login ${INPUT_DOCKER_REGISTRY} -u ${INPUT_DOCKER_USERNAME} -p ${INPUT_DOCKER_PASSWORD}"
+
 # Build Image
 echo "--- BUILD CONFIG ---"
 echo "REPO: ${REPO}"
