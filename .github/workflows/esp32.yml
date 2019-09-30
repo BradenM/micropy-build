@@ -23,59 +23,6 @@ jobs:
             branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
             tag: docker.pkg.github.com/bradenm/micropy-build/micropython:v1.11-esp32
-          - name: pycopy
-            repo: pfalcon/pycopy
-            branch: v2.11.0.10
-            idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycopy:v2.11.0.10-esp32
-          - name: pycom-wipy
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: WIPY
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-wipy
-          - name: pycom-lopy
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: LOPY
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-lopy
-          - name: pycom-sipy
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: SIPY
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-sipy
-          - name: pycom-gpy
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: GPY
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-gpy
-          - name: pycom-fipy
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: FIPY
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-fipy
-          - name: pycom-lopy4
-            repo: pycom/pycom-micropython-sigfox
-            branch: v1.18.3
-            idf: master
-            board: LOPY4
-            port_path: esp32
-            idf_repo: https://github.com/pycom/pycom-esp-idf.git
-            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-lopy4
 
     steps:
       - uses: actions/checkout@master
@@ -85,21 +32,19 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - uses: ./actions/build-micropython
       - name: Build ${{ matrix.args.name }} ESP32
-        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --build-arg BOARD="${{ matrix.args.board || 'GENERIC' }}" --build-arg PORT_PATH="${{ matrix.args.port_path || 'ports/esp32' }}" --build-arg IDF_REPO="${{ matrix.args.idf_repo || 'https://github.com/espressif/esp-idf.git' }}" --tag ${{ matrix.args.tag }} ./esp32
-
-      - name: Copy Binaries
-        run: |
-          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} bash -c 'mkdir -p /artifacts/ && find /micropython/${{ matrix.args.port_path || 'ports/esp32' }}/ -path "*.bin" -exec cp {} "$_" \;'
-          docker cp ${{ matrix.args.name }}:/artifacts ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
-          docker rm ${{ matrix.args.name }}
+        id: micropy-build
+        uses: actions/build-micropython@v1.0.0
+        with:
+          name: ${{ matrix.args.name }}
+          repo: ${{ matrix.args.repo }}
+          branch: ${{ matrix.args.branch }}
+          idf: ${{ matrix.args.idf }}
+          path: ./esp32
 
       - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
         with:
-          name: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
-          path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
-
-      - name: Publish Image
-        if: github.ref == 'refs/heads/master'
-        run: docker push ${{ matrix.args.tag }}
+          name: ${{ steps.micropy-build.outputs.binaries }}
+          path: ./${{ steps.micropy-build.outputs.binaries }}
