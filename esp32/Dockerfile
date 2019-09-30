@@ -7,6 +7,9 @@ ARG REPO=https://github.com/micropython/micropython.git
 ARG BRANCH=master
 ARG IDF=5c88c5996dbde6208e3bec05abc21ff6cd822d26
 ARG IDF_REPO=https://github.com/espressif/esp-idf.git
+# Compat (Pycom Sigfox)
+ARG PORT_PATH=ports/esp32
+ARG BOARD=GENERIC
 
 # Requirements
 RUN apt-get update \
@@ -31,6 +34,8 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
 USER micropython
 
 ENV ESPIDF=/esp-idf
+# Pycom Sigfox
+ENV IDF_PATH=/esp-idf
 
 # Build
 RUN cd micropython && make -C mpy-cross
@@ -44,8 +49,11 @@ ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
 USER root
 
-# Build ESP32
-RUN cd /micropython/ports/esp32 && make
+# Build ESP32 (Support Pycom Params)
+RUN cd /micropython/${PORT_PATH}\
+    && if [ "$BOARD" != "GENERIC" ]; then make -j5 BOARD=${BOARD} TARGET=boot\
+    && make -j5 BOARD=${BOARD} TARGET=app;\
+    else make; fi
 
 
 RUN mkdir /mnt/dev
