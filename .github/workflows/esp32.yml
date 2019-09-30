@@ -47,17 +47,17 @@ jobs:
       - name: Build ${{ matrix.args.name }} ESP32
         run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --build-arg BOARD="${{ matrix.args.board || 'GENERIC' }}" --build-arg PORT_PATH="${{ matrix.args.port_path || 'ports/esp32' }}" --build-arg IDF_REPO="${{ matrix.args.idf_repo || 'https://github.com/espressif/esp-idf.git' }}" --tag ${{ matrix.args.tag }} ./esp32
 
-      - name: Copy Firmware
+      - name: Copy Binaries
         run: |
-          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/${{ matrix.args.port_path || 'ports/esp32' }}/ -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
-          docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32.bin
+          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} bash -c 'mkdir -p /artifacts/ && find /micropython/${{ matrix.args.port_path || 'ports/esp32' }}/ -path "*.bin" -exec cp {} "$_" \;'
+          docker cp ${{ matrix.args.name }}:/artifacts ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
           docker rm ${{ matrix.args.name }}
 
-      - name: Upload Firmware Artifact
+      - name: Upload Binaries
         uses: actions/upload-artifact@v1.0.0
         with:
           name: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
-          path: ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32.bin
+          path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
 
       - name: Publish Image
         run: docker push ${{ matrix.args.tag }}
