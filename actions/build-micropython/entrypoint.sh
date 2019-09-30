@@ -6,6 +6,7 @@ DOCKERFILE="$1"
 # Generate Docker Tag Name
 FIRMWARE_NAME="$(echo "$INPUT_NAME" | cut -d'-' -f1)"
 BOARD_NAME="$(if [ "$BOARD" != 'GENERIC' ]; then echo "$BOARD" | tr '[:upper:]' '[:lower:]'; else echo "$INPUT_PORT"; fi)"
+PORT_PATH="${INPUT_PORT_ROOT}/${INPUT_PORT}"
 
 # Image Info
 DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
@@ -40,7 +41,15 @@ BINARIES="${INPUT_NAME}-${BRANCH}-${BOARD_NAME}" # (Uploaded Artifacts)
 ABS_PORT_PATH="/micropython/${INPUT_PORT_PATH}"
 
 # Gather Compiled Artifacts
-sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && find ${ABS_PORT_PATH}/ -path "*.bin" -exec cp {} ${ARTIFACTS}/ \;'"
+if [ "${INPUT_PORT}" = "unix" ]; then
+    # Copy Built Executable
+    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && cp ${ABS_PORT_PATH}/${INPUT_NAME} ${ARTIFACTS}'"
+else
+    # Recursively Copy Built Binaries
+    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && find ${ABS_PORT_PATH}/ -path "*.bin" -exec cp {} ${ARTIFACTS}/ \;'"
+fi
+
+# Copy and Cleanup
 sh -c "docker cp ${CONTAINER}:${ARTIFACTS} ./${BINARIES}"
 sh -c "docker rm ${CONTAINER}"
 

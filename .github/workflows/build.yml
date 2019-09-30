@@ -1,4 +1,4 @@
-name: Build ESP
+name: Build Ports
 
 on:
   push:
@@ -6,12 +6,14 @@ on:
       - master
     paths:
       - 'esp*/*'
-      - '.github/workflows/esp.yml'
+      - 'unix/*'
+      - '.github/workflows/build.yml'
       - 'actions/**/*'
   pull_request:
     paths:
       - 'esp*/*'
-      - '.github/workflows/esp.yml'
+      - 'unix/*'
+      - '.github/workflows/build.yml'
       - 'actions/**/*'
 
 jobs:
@@ -23,7 +25,7 @@ jobs:
         name: [micropython]
         repo: ['https://github.com/micropython/micropython.git']
         branch: [v1.11, v1.10]
-        port: [esp32, esp8266]
+        port: [esp32, esp8266, unix]
         include:
           - branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
@@ -62,7 +64,7 @@ jobs:
         name: [pycopy]
         repo: ['https://github.com/pfalcon/pycopy.git']
         branch: [v2.11.0.10]
-        port: [esp32, esp8266]
+        port: [esp32, esp8266, unix]
         include:
           - branch: v2.11.0.10
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
@@ -108,7 +110,7 @@ jobs:
         repo: ['https://github.com/pycom/pycom-micropython-sigfox.git']
         branch: [v1.18.3]
         idf: [master]
-        port_path: [esp32]
+        port_root: ['.']
         idf_repo: ['https://github.com/pycom/pycom-esp-idf.git']
         include:
           - name: pycom-wipy
@@ -137,7 +139,7 @@ jobs:
           idf: ${{ matrix.idf }}
           idf_repo: ${{ matrix.idf_repo }}
           board: ${{ matrix.board}}
-          port_path: ${{ matrix.port_path }}
+          port_root: ${{ matrix.port_root }}
           path: ./esp32
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}

@@ -23,10 +23,10 @@ inputs:
     description: 'Board Type to Build'
     required: false
     default: 'GENERIC'
-  port_path:
-    description: 'Path to Port relative to Repo Root'
+  port_root:
+    description: 'Path to Parent Dir of Ports'
     required: false
-    default: 'ports/esp32'
+    default: 'ports'
   port:
     description: 'Port to Compile'
     required: false
@@ -61,7 +61,6 @@ runs:
     BRANCH: ${{ inputs.branch }}
     IDF: ${{ inputs.idf }}
     BOARD: ${{ inputs.board }}
-    PORT_PATH: ${{ inputs.port_path }}
     IDF_REPO: ${{ inputs.idf_repo }}
   args:
     - ${{ inputs.path }}
