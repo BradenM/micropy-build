@@ -1,5 +1,7 @@
 #!/bin/sh -l
 
+set -x
+
 # Dockerfile Path
 DOCKERFILE="$1"
 
@@ -16,7 +18,13 @@ CONTAINER="$INPUT_NAME"
 # Docker Authenticate
 sh -c "docker login ${INPUT_DOCKER_REGISTRY} -u ${INPUT_DOCKER_USERNAME} -p ${INPUT_DOCKER_PASSWORD}"
 
+# Paths
+ARTIFACTS="/artifacts"
+BINARIES="${INPUT_NAME}-${BRANCH}-${BOARD_NAME}" # (Uploaded Artifacts)
+ABS_PORT_PATH="/micropython/${INPUT_PORT_PATH:=$PORT_PATH}"
+
 # Build Image
+echo
 echo "--- BUILD CONFIG ---"
 echo "REPO: ${REPO}"
 echo "BRANCH: ${BRANCH}"
@@ -25,6 +33,9 @@ echo "IDF: ${IDF}"
 echo "IDF_REPO: ${IDF_REPO}"
 echo "PORT_PATH: ${PORT_PATH}"
 echo "BOARD: ${BOARD}"
+echo "ARTIFACTS: ${ARTIFACTS}"
+echo "BINARIES: ${BINARIES}"
+echo "ABS_PORT_PATH: ${ABS_PORT_PATH}"
 echo
 
 docker build -t "$DOCKER_TAG" "$DOCKERFILE" \
@@ -35,18 +46,13 @@ docker build -t "$DOCKER_TAG" "$DOCKERFILE" \
     --build-arg PORT_PATH="${PORT_PATH}" \
     --build-arg BOARD="${BOARD}"
 
-# Paths
-ARTIFACTS="/artifacts"
-BINARIES="${INPUT_NAME}-${BRANCH}-${BOARD_NAME}" # (Uploaded Artifacts)
-ABS_PORT_PATH="/micropython/${INPUT_PORT_PATH}"
-
 # Gather Compiled Artifacts
 if [ "${INPUT_PORT}" = "unix" ]; then
     # Copy Built Executable
     sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && cp ${ABS_PORT_PATH}/${INPUT_NAME} ${ARTIFACTS}'"
 else
     # Recursively Copy Built Binaries
-    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && find ${ABS_PORT_PATH}/ -path "*.bin" -exec cp {} ${ARTIFACTS}/ \;'"
+    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && find ${ABS_PORT_PATH}/ -path "*.bin" -exec cp {} ${ARTIFACTS} \;'"
 fi
 
 # Copy and Cleanup
