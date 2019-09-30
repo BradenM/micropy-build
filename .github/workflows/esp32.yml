@@ -28,6 +28,12 @@ jobs:
             branch: v2.11.0.10
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
             tag: docker.pkg.github.com/bradenm/micropy-build/pycopy:v2.11.0.10-esp32
+          - name: pycom-wipy
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-wipy
     steps:
       - uses: actions/checkout@master
       - uses: azure/docker-login@v1
@@ -37,11 +43,11 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build ${{ matrix.args.name }} ESP32
-        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --tag ${{ matrix.args.tag }} ./esp32
+        run: docker build --build-arg REPO="https://github.com/${{ matrix.args.repo }}.git" --build-arg BRANCH="${{ matrix.args.branch }}" --build-arg IDF="${{ matrix.args.idf }}" --build-arg BOARD="${{ matrix.args.board || N }}" --build-arg PORT_PATH="${{ matrix.args.port_path || ports/esp32 }}" --build-args IDF_REPO="${{ matrix.args.idf_repo || https://github.com/espressif/esp-idf.git }}" --tag ${{ matrix.args.tag }} ./esp32
 
       - name: Copy Firmware
         run: |
-          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/ports/esp32/ -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
+          docker run --name ${{ matrix.args.name }} -i ${{ matrix.args.tag }} find /micropython/${{ matrix.args.port_path || ports/esp32 }}/ -iname "*firmware*.bin" -exec cp {} /firmware.bin \;
           docker cp ${{ matrix.args.name }}:/firmware.bin ${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32.bin
           docker rm ${{ matrix.args.name }}
 
