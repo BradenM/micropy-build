@@ -4,7 +4,7 @@
 DOCKERFILE="$1"
 
 # Generate Docker Tag Name
-FIRMWARE_NAME="$(cut -d'-' -f1 <<<"$INPUT_NAME")"
+FIRMWARE_NAME="$(echo "$INPUT_NAME" | cut -d'-' -f1)"
 BOARD_NAME="$(if [ "$BOARD" != 'GENERIC' ]; then echo "$BOARD" | tr '[:upper:]' '[:lower:]'; else echo 'esp32'; fi)"
 
 # Image Info
@@ -13,7 +13,22 @@ DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}:${BRANCH}-${BOARD_NAME}"
 CONTAINER="$INPUT_NAME"
 
 # Build Image
-sh -c "docker build -t ${DOCKER_TAG} ${DOCKERFILE}"
+echo "--- BUILD CONFIG ---"
+echo "REPO: ${REPO}"
+echo "BRANCH: ${BRANCH}"
+echo "IDF: ${IDF}"
+echo "IDF_REPO: ${IDF_REPO}"
+echo "PORT_PATH: ${PORT_PATH}"
+echo "BOARD: ${BOARD}"
+echo
+
+docker build -t "$DOCKER_TAG" "$DOCKERFILE" \
+    --build-arg REPO="${REPO}" \
+    --build-arg BRANCH="${BRANCH}" \
+    --build-arg IDF="${IDF}" \
+    --build-arg IDF_REPO="${IDF_REPO}" \
+    --build-arg PORT_PATH="${PORT_PATH}" \
+    --build-arg BOARD="${BOARD}"
 
 # Paths
 ARTIFACTS="/artifacts"
