@@ -52,5 +52,5 @@ jobs:
           path: ${{ matrix.args.name }}
 
       - name: Publish Image
-        if: github.ref == master
+        if: github.ref == 'master'
         run: docker push ${{ matrix.args.tag }}

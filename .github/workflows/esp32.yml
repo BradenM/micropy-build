@@ -36,6 +36,47 @@ jobs:
             port_path: esp32
             idf_repo: https://github.com/pycom/pycom-esp-idf.git
             tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-wipy
+          - name: pycom-lopy
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            board: LOPY
+            port_path: esp32
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-lopy
+          - name: pycom-sipy
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            board: SIPY
+            port_path: esp32
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-sipy
+          - name: pycom-gpy
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            board: GPY
+            port_path: esp32
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-gpy
+          - name: pycom-fipy
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            board: FIPY
+            port_path: esp32
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-fipy
+          - name: pycom-lopy4
+            repo: pycom/pycom-micropython-sigfox
+            branch: v1.18.3
+            idf: master
+            board: LOPY4
+            port_path: esp32
+            idf_repo: https://github.com/pycom/pycom-esp-idf.git
+            tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-lopy4
+
     steps:
       - uses: actions/checkout@master
       - uses: azure/docker-login@v1
@@ -60,5 +101,5 @@ jobs:
           path: ./${{ matrix.args.name }}-${{ matrix.args.branch }}-esp32
 
       - name: Publish Image
-        if: github.ref == master
+        if: github.ref == 'master'
         run: docker push ${{ matrix.args.tag }}
