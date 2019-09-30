@@ -32,6 +32,7 @@ jobs:
             repo: pycom/pycom-micropython-sigfox
             branch: v1.18.3
             idf: master
+            port_path: esp32
             idf_repo: https://github.com/pycom/pycom-esp-idf.git
             tag: docker.pkg.github.com/bradenm/micropy-build/pycom:v1.18.3-wipy
     steps:
