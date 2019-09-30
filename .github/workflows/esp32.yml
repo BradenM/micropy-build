@@ -7,6 +7,10 @@ on:
     paths:
       - 'esp32/*'
       - '.github/workflows/esp32.yml'
+  pull_request:
+    paths:
+      - 'esp32/*'
+      - '.github/workflows/esp32.yml'
 
 jobs:
   build:
