@@ -9,7 +9,7 @@ ARG IDF=5c88c5996dbde6208e3bec05abc21ff6cd822d26
 ARG IDF_REPO=https://github.com/espressif/esp-idf.git
 # Compat (Pycom Sigfox)
 ARG PORT_PATH=ports/esp32
-ARG BOARD
+ARG BOARD=GENERIC
 
 # Requirements
 RUN apt-get update \
@@ -51,7 +51,7 @@ USER root
 
 # Build ESP32 (Support Pycom Params)
 RUN cd /micropython/${PORT_PATH}\
-    && if [ "x$BOARD" != "x" ]; then make -j5 BOARD=${BOARD} TARGET=boot\
+    && if [ "$BOARD" != "GENERIC" ]; then make -j5 BOARD=${BOARD} TARGET=boot\
     && make -j5 BOARD=${BOARD} TARGET=app;\
     else make; fi
 
