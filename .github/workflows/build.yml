@@ -5,13 +5,15 @@ on:
     branches:
       - master
     paths:
-      - 'esp*/*'
+      - 'esp32/*'
+      - 'esp8266/*'
       - 'unix/*'
       - '.github/workflows/build.yml'
       - 'actions/**/*'
   pull_request:
     paths:
-      - 'esp*/*'
+      - 'esp32/*'
+      - 'esp8266/*'
       - 'unix/*'
       - '.github/workflows/build.yml'
       - 'actions/**/*'
