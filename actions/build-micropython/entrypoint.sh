@@ -38,7 +38,7 @@ echo "BINARIES: ${BINARIES}"
 echo "ABS_PORT_PATH: ${ABS_PORT_PATH}"
 echo
 
-docker build -t "$DOCKER_TAG" "$DOCKERFILE" \
+docker build -t "$DOCKER_TAG" -f "$DOCKERFILE" . \
     --build-arg REPO="${REPO}" \
     --build-arg BRANCH="${BRANCH}" \
     --build-arg IDF="${IDF}" \
@@ -47,13 +47,7 @@ docker build -t "$DOCKER_TAG" "$DOCKERFILE" \
     --build-arg BOARD="${BOARD}"
 
 # Gather Compiled Artifacts
-if [ "${INPUT_PORT}" = "unix" ]; then
-    # Copy Built Executable
-    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && cp ${ABS_PORT_PATH}/${INPUT_NAME} ${ARTIFACTS}'"
-else
-    # Recursively Copy Built Binaries
-    sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} bash -c 'mkdir -p ${ARTIFACTS} && find ${ABS_PORT_PATH}/ -path "*.bin" -exec cp {} ${ARTIFACTS} \;'"
-fi
+sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} copy"
 
 # Copy and Cleanup
 sh -c "docker cp ${CONTAINER}:${ARTIFACTS} ./${BINARIES}"
