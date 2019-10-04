@@ -34,7 +34,7 @@ def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
         dest (os.PathLike): Path to copy artifacts to.
         binary (str): Name of Firmware (unix executable).
     """
-    print(f"\n-- Copying Artifacts to {dest} --\n")
+    print("\n-- Copying Artifacts to %s --\n" % dest)
     dest = Path(dest).absolute()
     dest.mkdir(exist_ok=True, parents=True)
     binaries = list(PORT_PATH.rglob("*.bin"))
@@ -42,7 +42,7 @@ def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
     print("[Found Artifacts]\n", "\n".join(str(p) for p in binaries), "\n")
     for f in binaries:
         f_dest = shutil.copy2(f, dest)
-        print(f"[Copied] {f.name} ==> {f_dest}")
+        print("[Copied] %s ==> %s" % (f.name, str(f_dest)))
     print("Done!")
 
 
