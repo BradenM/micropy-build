@@ -3,7 +3,7 @@
 set -x
 
 # Dockerfile Path
-DOCKERFILE="$1"
+DOCKERFILE="${1}/Dockerfile"
 
 # Generate Docker Tag Name
 FIRMWARE_NAME="$(echo "$INPUT_NAME" | cut -d'-' -f1)"

@@ -27,3 +27,9 @@ RUN cd micropython/ports/unix && make
 
 # Run Tests
 RUN cd micropython/ports/unix && make test
+
+# Setup Entrypoint
+# Must copy entrypoint or build from parent dir with -f option
+COPY ./docker-entrypoint.py /docker-entrypoint.py
+
+ENTRYPOINT ["/usr/bin/python3", "/docker-entrypoint.py"]
