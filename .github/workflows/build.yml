@@ -67,10 +67,12 @@ jobs:
       matrix:
         name: [pycopy]
         repo: ['https://github.com/pfalcon/pycopy.git']
-        branch: [v2.11.0.10]
+        branch: [v2.11.0.10, v2.11.0.12]
         port: [esp32, esp8266, unix]
         include:
           - branch: v2.11.0.10
+            idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
+          - branch: v2.11.0.12
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
 
     steps:
