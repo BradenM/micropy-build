@@ -114,7 +114,7 @@ jobs:
             pycom-lopy4,
           ]
         repo: ['https://github.com/pycom/pycom-micropython-sigfox.git']
-        branch: [v1.18.3]
+        branch: [v1.18.3, v1.20.1.r1]
         idf: [master]
         port_root: ['.']
         idf_repo: ['https://github.com/pycom/pycom-esp-idf.git']
