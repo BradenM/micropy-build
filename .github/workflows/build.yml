@@ -72,7 +72,7 @@ jobs:
         include:
           - branch: v2.11.0.10
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
-          - branch: v2.11.0.13
+          - branch: v2.11.0.14
             idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
 
     steps:
