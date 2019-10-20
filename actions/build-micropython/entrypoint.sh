@@ -12,7 +12,7 @@ PORT_PATH="${INPUT_PORT_ROOT}/${INPUT_PORT}"
 
 # Image Info
 DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
-DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}:${BRANCH}-${BOARD_NAME}"
+DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}-${BOARD_NAME}:${BRANCH}"
 CONTAINER="$INPUT_NAME"
 
 # Docker Authenticate
