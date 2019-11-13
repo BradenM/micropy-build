@@ -22,14 +22,14 @@ ENV BOARD ${BOARD:-GENERIC}
 
 # Requirements
 RUN apt-get update \
-    && apt-get install -y gcc git wget make libncurses-dev flex bison gperf python3 python3-pip python-setuptools python-serial python-cryptography python-future python-pyparsing python-pyelftools
+    && apt-get install -y gcc git wget make libncurses-dev flex bison gperf python3 python3-pip python-setuptools python-serial python-cryptography python-future python-pyelftools
 
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd micropython
 
 # Python Reqs
-RUN pip3 install pyserial pyparsing
+RUN pip3 install pyserial pyparsing==2.3.1
 
 # Fetch and Setup Repos
 RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
