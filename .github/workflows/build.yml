@@ -5,20 +5,20 @@ on:
     branches:
       - master
     paths:
-      - 'docker-entrypoint.py'
-      - 'esp32/*'
-      - 'esp8266/*'
-      - 'unix/*'
-      - '.github/workflows/build.yml'
-      - 'actions/**/*'
+      - "docker-entrypoint.py"
+      - "esp32/*"
+      - "esp8266/*"
+      - "unix/*"
+      - ".github/workflows/build.yml"
+      - "actions/**/*"
   pull_request:
     paths:
-      - 'docker-entrypoint.py'
-      - 'esp32/*'
-      - 'esp8266/*'
-      - 'unix/*'
-      - '.github/workflows/build.yml'
-      - 'actions/**/*'
+      - "docker-entrypoint.py"
+      - "esp32/*"
+      - "esp8266/*"
+      - "unix/*"
+      - ".github/workflows/build.yml"
+      - "actions/**/*"
 
 jobs:
   build_micropython:
@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         name: [micropython]
-        repo: ['https://github.com/micropython/micropython.git']
+        repo: ["https://github.com/micropython/micropython.git"]
         branch: [v1.12, v1.11]
         port: [esp32, esp8266, unix]
         include:
@@ -35,7 +35,6 @@ jobs:
             idf: 310beae373446ceb9a4ad9b36b5428d7fdf2705f
           - branch: v1.11
             idf: 5c88c5996dbde6208e3bec05abc21ff6cd822d26
-          
 
     steps:
       - uses: actions/checkout@master
@@ -67,14 +66,12 @@ jobs:
     strategy:
       matrix:
         name: [pycopy]
-        repo: ['https://github.com/pfalcon/pycopy.git']
-        branch: [v2.11.0.20, v2.11.0.15]
+        repo: ["https://github.com/pfalcon/pycopy.git"]
+        branch: [v3.0.0]
         port: [esp32, esp8266, unix]
         include:
-          - branch: v2.11.0.20
+          - branch: v3.0.0
             idf: 310beae373446ceb9a4ad9b36b5428d7fdf2705f
-          - branch: v2.11.0.15
-            idf: 6ccb4cf5b7d1fdddb8c2492f9cbc926abaf230df
 
     steps:
       - uses: actions/checkout@master
@@ -114,11 +111,11 @@ jobs:
             pycom-fipy,
             pycom-lopy4,
           ]
-        repo: ['https://github.com/pycom/pycom-micropython-sigfox.git']
+        repo: ["https://github.com/pycom/pycom-micropython-sigfox.git"]
         branch: [v1.18.3, v1.20.1.r1]
         idf: [master]
-        port_root: ['.']
-        idf_repo: ['https://github.com/pycom/pycom-esp-idf.git']
+        port_root: ["."]
+        idf_repo: ["https://github.com/pycom/pycom-esp-idf.git"]
         include:
           - name: pycom-wipy
             board: WIPY
