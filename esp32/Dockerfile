@@ -32,6 +32,8 @@ RUN pip3 install pyserial pyparsing==2.3.1
 RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
     && git clone $REPO micropython \
     && cd esp-idf && git checkout $IDF && git submodule update --init --recursive\
+    # @see https://github.com/pfalcon/pycopy/issues/48
+    && if [[ $REPO == *"pycopy"* ]]; then (cd esp-idf/components/mbedtls/; rm -rf mbedtls; git clone -b mbedtls-2.16.5-idf-pycopy https://github.com/pfalcon/mbedtls/); fi\
     && cd .. && cd micropython && git checkout $BRANCH && git pull origin $BRANCH\
     && chown -R micropython:micropython ../esp-idf ../micropython ../esp
 
