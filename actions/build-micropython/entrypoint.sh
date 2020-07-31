@@ -38,7 +38,7 @@ echo "BINARIES: ${BINARIES}"
 echo "ABS_PORT_PATH: ${ABS_PORT_PATH}"
 echo
 
-docker build -t "$DOCKER_TAG" -f "$DOCKERFILE" . \
+docker build --target mpbuild -t "$DOCKER_TAG" -f "$DOCKERFILE" . \
     --build-arg REPO="${REPO}" \
     --build-arg BRANCH="${BRANCH}" \
     --build-arg IDF="${IDF}" \
