@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM python:3.7-slim as builder
 
 LABEL maintainer="bradenmars@bradenmars.me"
 LABEL description="MicroPython ESP32 Build Dockerfile"
@@ -39,6 +39,8 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
     && chown -R micropython:micropython ../esp-idf ../micropython ../esp
 
 
+FROM builder as toolkit
+
 # Environment
 USER micropython
 
@@ -46,7 +48,7 @@ ENV ESPIDF=/esp-idf
 # Pycom Sigfox
 ENV IDF_PATH=/esp-idf
 
-# Build
+# Build Mpy Cross & ESP32 Toolkit
 RUN cd micropython && make -C mpy-cross
 RUN cd micropython && git submodule init lib/berkeley-db-1.xx && git submodule update
 
@@ -55,6 +57,9 @@ RUN cd esp && mkdir xtensa-esp32-elf\
     && tar -xzf ./xtensa-esp32-elf-linux64-1.22.0-98-g4638c4f-5.2.0-20190827.tar.gz -C ./xtensa-esp32-elf
 ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
+ENTRYPOINT [ "/bin/bash" ]
+
+FROM toolkit as mpbuild
 
 USER root
 
