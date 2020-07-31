@@ -47,6 +47,9 @@ inputs:
   path:
     description: 'Path to Dockerfile'
     required: true
+  base_image:
+    description: 'Base Image for building from.'
+    required: true
 outputs:
   binaries:
     description: 'Path to Compiled Binaries'

@@ -41,6 +41,7 @@ jobs:
           submodules: true
 
       - name: Build ${{ matrix.name }} ${{ matrix.port }} Base
+        id: build-base
         uses: whoan/docker-build-with-cache-action@master
         with:
           username: bradenm
@@ -62,6 +63,7 @@ jobs:
           idf: ${{ matrix.idf }}
           port: ${{ matrix.port }}
           path: ./${{ matrix.port }}
+          base_image: ${{ steps.build-base.outputs.FULL_IMAGE_NAME }}
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}

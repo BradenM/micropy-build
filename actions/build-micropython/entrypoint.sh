@@ -13,6 +13,7 @@ PORT_PATH="${INPUT_PORT_ROOT}/${INPUT_PORT}"
 # Image Info
 DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
 DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}-${BOARD_NAME}:${BRANCH}"
+DOCKER_BASE_IMAGE="${INPUT_BASE_IMAGE}"
 CONTAINER="$INPUT_NAME"
 
 # Docker Authenticate
@@ -26,6 +27,7 @@ ABS_PORT_PATH="/micropython/${INPUT_PORT_PATH:=$PORT_PATH}"
 # Build Image
 echo
 echo "--- BUILD CONFIG ---"
+echo "BASE: ${DOCKER_BASE_IMAGE}"
 echo "REPO: ${REPO}"
 echo "BRANCH: ${BRANCH}"
 echo "PORT: ${INPUT_PORT}"
@@ -38,7 +40,11 @@ echo "BINARIES: ${BINARIES}"
 echo "ABS_PORT_PATH: ${ABS_PORT_PATH}"
 echo
 
-docker build --target mpbuild -t "$DOCKER_TAG" -f "$DOCKERFILE" . \
+docker build \
+    --target mpbuild \
+    --cache-from "$DOCKER_BASE_IMAGE" \
+    -t "$DOCKER_TAG" \
+    -f "$DOCKERFILE" . \
     --build-arg REPO="${REPO}" \
     --build-arg BRANCH="${BRANCH}" \
     --build-arg IDF="${IDF}" \
