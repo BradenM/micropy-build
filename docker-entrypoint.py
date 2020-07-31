@@ -24,7 +24,7 @@ MICROPY_NAME = os.environ.get("INPUT_NAME", "micropython")
 # Port Container is building for
 PORT = os.environ.get("INPUT_PORT", "esp32")
 PORT_ROOT = os.environ.get("INPUT_PORT_ROOT", (MICROPY_ROOT / "ports"))
-PORT_PATH = PORT_ROOT / PORT
+PORT_PATH = Path(PORT_ROOT) / PORT
 
 
 def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
