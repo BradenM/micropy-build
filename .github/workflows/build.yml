@@ -21,11 +21,11 @@ on:
       - "actions/**/*"
 
 jobs:
-
   build_micropython:
     name: Build MicroPython
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         name: [micropython]
         repo: ["https://github.com/micropython/micropython.git"]
@@ -69,47 +69,62 @@ jobs:
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Upload Binaries
-        uses: actions/upload-artifact@v1.0.0
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.micropy-build.outputs.binaries }}
           path: ./${{ steps.micropy-build.outputs.binaries }}
 
-  # build_pycopy:
-  #   name: Build Pycopy
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix:
-  #       name: [pycopy]
-  #       repo: ["https://github.com/pfalcon/pycopy.git"]
-  #       branch: [v3.2.4]
-  #       port: [esp32, esp8266, unix]
-  #       include:
-  #         - branch: v3.2.4
-  #           idf: 4c81978a3e2220674a432a588292a4c860eef27b
+  build_pycopy:
+    name: Build Pycopy
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [pycopy]
+        repo: ["https://github.com/pfalcon/pycopy.git"]
+        branch: [v3.2.4]
+        port: [esp32]
+        include:
+          - branch: v3.2.4
+            idf: 4c81978a3e2220674a432a588292a4c860eef27b
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
 
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - uses: textbook/git-checkout-submodule-action@2.0.0
+      - name: Build ${{ matrix.name }} ${{ matrix.port }} Base
+        id: build-base
+        uses: whoan/docker-build-with-cache-action@master
+        with:
+          username: bradenm
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          registry: docker.pkg.github.com
+          image_name: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
+          image_tag: latest
+          build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
+          context: .
+          dockerfile: esp32/Dockerfile
 
-  #     - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
-  #       id: micropy-build
-  #       uses: ./actions/build-micropython
-  #       with:
-  #         name: ${{ matrix.name }}
-  #         repo: ${{ matrix.repo }}
-  #         branch: ${{ matrix.branch }}
-  #         idf: ${{ matrix.idf }}
-  #         port: ${{ matrix.port }}
-  #         path: ./${{ matrix.port }}
-  #         docker_registry: docker.pkg.github.com
-  #         docker_username: ${{ secrets.REGISTRY_USERNAME }}
-  #         docker_password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
+        id: micropy-build
+        uses: ./actions/build-micropython
+        with:
+          name: ${{ matrix.name }}
+          repo: ${{ matrix.repo }}
+          branch: ${{ matrix.branch }}
+          idf: ${{ matrix.idf }}
+          port: ${{ matrix.port }}
+          path: ./${{ matrix.port }}
+          base_image: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
+          docker_registry: docker.pkg.github.com
+          docker_username: ${{ secrets.REGISTRY_USERNAME }}
+          docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
-  #     - name: Upload Binaries
-  #       uses: actions/upload-artifact@v1.0.0
-  #       with:
-  #         name: ${{ steps.micropy-build.outputs.binaries }}
-  #         path: ./${{ steps.micropy-build.outputs.binaries }}
+      - name: Upload Binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.micropy-build.outputs.binaries }}
+          path: ./${{ steps.micropy-build.outputs.binaries }}
 
   # build_pycom:
   #   name: Build Pycom
@@ -146,7 +161,6 @@ jobs:
   #   steps:
   #     - uses: actions/checkout@master
   #     - uses: textbook/git-checkout-submodule-action@2.0.0
-
   #     - name: Build ${{ matrix.name }} ESP32 ${{ matrix.branch }}
   #       id: micropy-build
   #       uses: ./actions/build-micropython
@@ -162,7 +176,6 @@ jobs:
   #         docker_registry: docker.pkg.github.com
   #         docker_username: ${{ secrets.REGISTRY_USERNAME }}
   #         docker_password: ${{ secrets.REGISTRY_PASSWORD }}
-
   #     - name: Upload Binaries
   #       uses: actions/upload-artifact@v1.0.0
   #       with:
