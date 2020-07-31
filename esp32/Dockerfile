@@ -1,29 +1,21 @@
 # ESP32 Micropython Dockerfile
 
+FROM python:3.7-slim as builder
+
+LABEL maintainer="bradenmars@bradenmars.me"
+LABEL description="MicroPython ESP32 Build Dockerfile"
+
 # Allow Args to Override Env
 ARG REPO
 ARG BRANCH
 ARG IDF
 ARG IDF_REPO
-## MPBuild Base Tag
-ARG BUILD_TAG
-## Compat (Pycom Sigfox)
-ARG PORT_PATH
-ARG BOARD
-
-
-FROM python:3.7-slim as builder
-
-LABEL maintainer="bradenmars@bradenmars.me"
-LABEL description="MicroPython ESP32 Build Dockerfile"
 
 # Environment
 ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
 ENV BRANCH ${BRANCH:-master}
 ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
 ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
-ENV PORT_PATH ${PORT_PATH:-ports/esp32}
-ENV BOARD ${BOARD:-GENERIC}
 
 # Requirements
 RUN apt-get update \
@@ -46,14 +38,6 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
 
 FROM builder as toolkit
 
-# Environment
-ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
-ENV BRANCH ${BRANCH:-master}
-ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
-ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
-ENV PORT_PATH ${PORT_PATH:-ports/esp32}
-ENV BOARD ${BOARD:-GENERIC}
-
 USER micropython
 
 ENV ESPIDF=/esp-idf
@@ -69,19 +53,26 @@ RUN cd esp && mkdir xtensa-esp32-elf\
     && tar -xzf ./xtensa-esp32-elf-linux64-1.22.0-98-g4638c4f-5.2.0-20190827.tar.gz -C ./xtensa-esp32-elf
 ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
+# Post-build Helpers
+RUN apt-get update \
+    && apt-get install -y usbutils picocom \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 ENTRYPOINT [ "/bin/bash" ]
 
 
+FROM toolkit as mpbuild
 
-FROM docker.pkg.github.com/bradenm/micropy-build/micropy-build:$BUILD_TAG as mpbuild
+## Compat (Pycom Sigfox)
+ARG PORT_PATH
+ARG BOARD
+ARG BRANCH
 
 # Environment
-ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
-ENV BRANCH ${BRANCH:-master}
-ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
-ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
 ENV PORT_PATH ${PORT_PATH:-ports/esp32}
 ENV BOARD ${BOARD:-GENERIC}
+ENV BRANCH ${BRANCH:-master}
 
 USER root
 
@@ -91,14 +82,9 @@ RUN cd /micropython/${PORT_PATH}\
     && make -j5 BOARD=${BOARD} TARGET=app;\
     else make; fi
 
-
 RUN mkdir /mnt/dev
 ENV PATH=/micropython/mpy-cross:$PATH
 
-
-# Post-build Helpers
-RUN apt-get update \
-    && apt-get install -y usbutils picocom
 
 # Setup Entrypoint
 # Must copy entrypoint or build from parent dir with -f option

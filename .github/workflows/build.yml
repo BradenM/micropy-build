@@ -47,8 +47,8 @@ jobs:
           username: bradenm
           password: "${{ secrets.GITHUB_TOKEN }}"
           registry: docker.pkg.github.com
-          image_name: micropy-build
-          image_tag: ${{ matrix.port }}-${{ matrix.name }}-${{ matrix.branch }}-base
+          image_name: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
+          image_tag: latest
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
           context: .
           dockerfile: esp32/Dockerfile
@@ -63,8 +63,7 @@ jobs:
           idf: ${{ matrix.idf }}
           port: ${{ matrix.port }}
           path: ./${{ matrix.port }}
-          base_image: ${{ steps.build-base.outputs.FULL_IMAGE_NAME }}
-          base_build_tag: ${{ matrix.port }}-${{ matrix.name }}-${{ matrix.branch }}-base
+          base_image: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}

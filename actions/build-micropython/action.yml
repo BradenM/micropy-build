@@ -50,9 +50,6 @@ inputs:
   base_image:
     description: 'Base Image for building from.'
     required: true
-  base_build_tag:
-    description: 'Base Image build tag.'
-    required: true
 outputs:
   binaries:
     description: 'Path to Compiled Binaries'
