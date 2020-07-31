@@ -64,6 +64,7 @@ jobs:
           port: ${{ matrix.port }}
           path: ./${{ matrix.port }}
           base_image: ${{ steps.build-base.outputs.FULL_IMAGE_NAME }}
+          base_build_tag: ${{ matrix.port }}-${{ matrix.name }}-${{ matrix.branch }}-base
           docker_registry: docker.pkg.github.com
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}

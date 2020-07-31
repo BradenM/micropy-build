@@ -28,6 +28,7 @@ ABS_PORT_PATH="/micropython/${INPUT_PORT_PATH:=$PORT_PATH}"
 echo
 echo "--- BUILD CONFIG ---"
 echo "BASE: ${DOCKER_BASE_IMAGE}"
+echo "BUILD TAG: ${INPUT_BASE_BUILD_TAG}"
 echo "REPO: ${REPO}"
 echo "BRANCH: ${BRANCH}"
 echo "PORT: ${INPUT_PORT}"
@@ -42,9 +43,9 @@ echo
 
 docker build \
     --target mpbuild \
-    --cache-from "$DOCKER_BASE_IMAGE" \
     -t "$DOCKER_TAG" \
     -f "$DOCKERFILE" . \
+    --build-arg BUILD_TAG="${INPUT_BASE_BUILD_TAG}" \
     --build-arg REPO="${REPO}" \
     --build-arg BRANCH="${BRANCH}" \
     --build-arg IDF="${IDF}" \

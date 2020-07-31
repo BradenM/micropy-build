@@ -8,7 +8,9 @@ ARG REPO
 ARG BRANCH
 ARG IDF
 ARG IDF_REPO
-# Compat (Pycom Sigfox)
+## MPBuild Base Tag
+ARG BUILD_TAG
+## Compat (Pycom Sigfox)
 ARG PORT_PATH
 ARG BOARD
 
@@ -59,7 +61,7 @@ ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
 ENTRYPOINT [ "/bin/bash" ]
 
-FROM toolkit as mpbuild
+FROM docker.pkg.github.com/bradenm/micropy-build/micropy-build:$BUILD_TAG as mpbuild
 
 USER root
 
