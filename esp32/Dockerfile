@@ -1,7 +1,4 @@
-FROM python:3.7-slim as builder
-
-LABEL maintainer="bradenmars@bradenmars.me"
-LABEL description="MicroPython ESP32 Build Dockerfile"
+# ESP32 Micropython Dockerfile
 
 # Allow Args to Override Env
 ARG REPO
@@ -14,13 +11,19 @@ ARG BUILD_TAG
 ARG PORT_PATH
 ARG BOARD
 
+
+FROM python:3.7-slim as builder
+
+LABEL maintainer="bradenmars@bradenmars.me"
+LABEL description="MicroPython ESP32 Build Dockerfile"
+
+# Environment
 ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
 ENV BRANCH ${BRANCH:-master}
 ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
 ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
 ENV PORT_PATH ${PORT_PATH:-ports/esp32}
 ENV BOARD ${BOARD:-GENERIC}
-
 
 # Requirements
 RUN apt-get update \
@@ -44,6 +47,13 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
 FROM builder as toolkit
 
 # Environment
+ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
+ENV BRANCH ${BRANCH:-master}
+ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
+ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
+ENV PORT_PATH ${PORT_PATH:-ports/esp32}
+ENV BOARD ${BOARD:-GENERIC}
+
 USER micropython
 
 ENV ESPIDF=/esp-idf
@@ -61,7 +71,17 @@ ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
 ENTRYPOINT [ "/bin/bash" ]
 
+
+
 FROM docker.pkg.github.com/bradenm/micropy-build/micropy-build:$BUILD_TAG as mpbuild
+
+# Environment
+ENV REPO ${REPO:-https://github.com/micropython/micropython.git}
+ENV BRANCH ${BRANCH:-master}
+ENV IDF ${IDF:-5c88c5996dbde6208e3bec05abc21ff6cd822d26}
+ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
+ENV PORT_PATH ${PORT_PATH:-ports/esp32}
+ENV BOARD ${BOARD:-GENERIC}
 
 USER root
 
