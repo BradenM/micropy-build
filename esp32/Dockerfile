@@ -38,6 +38,12 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
 
 FROM builder as toolkit
 
+# Post-build Helpers
+RUN apt-get update \
+    && apt-get install -y usbutils picocom \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 USER micropython
 
 ENV ESPIDF=/esp-idf
@@ -52,12 +58,6 @@ RUN cd esp && wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-9
 RUN cd esp && mkdir xtensa-esp32-elf\
     && tar -xzf ./xtensa-esp32-elf-linux64-1.22.0-98-g4638c4f-5.2.0-20190827.tar.gz -C ./xtensa-esp32-elf
 ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
-
-# Post-build Helpers
-RUN apt-get update \
-    && apt-get install -y usbutils picocom \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT [ "/bin/bash" ]
 
