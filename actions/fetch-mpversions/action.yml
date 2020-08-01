@@ -1,22 +1,20 @@
-name: 'Fetch Micropython Versions'
-author: 'BradenM'
-description: 'Build and Publish Micropython Port'
+name: "Fetch Micropython Versions"
+author: "BradenM"
+description: "Build and Publish Micropython Port"
 inputs:
   token:
-    description: 'Github Token'
+    description: "Github Token"
     required: true
-  max-count: 
-    description: 'Max # of versions to fetch'
+  max-count:
+    description: "Max # of versions to fetch"
     required: false
-    default: '1'
-  ports:
-    description: 'Ports to build for'
+    default: "1"
+  builds:
+    description: "Build Definitions to search for."
     required: true
 outputs:
   versions:
-    description: 'List of versions'
-  micropython:
-    description: 'mp'
+    description: "List of versions"
 runs:
   using: "node12"
   main: "dist/index.js"

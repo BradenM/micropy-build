@@ -27,6 +27,7 @@ jobs:
     outputs:
       versions: ${{ steps.fetch.outputs.versions }}
       micropython: ${{steps.fetch.outputs.micropython}}
+      pycopy: ${{steps.fetch.outputs.pycopy}}
 
     steps:
       - uses: actions/checkout@v2
@@ -37,11 +38,7 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           max-count: 1
-          ports:
-            micropython:
-              - esp32
-            pycopy:
-              - esp32
+          builds: 'micropython|esp32,pycopy|esp32'
 
   build_micropython:
     name: Build MicroPython
@@ -97,12 +94,8 @@ jobs:
     needs: fetch_versions
     strategy:
       fail-fast: false
-      matrix:
-        name: [pycopy]
-        repo: ["https://github.com/pfalcon/pycopy.git"]
-        branch: ${{ fromJson(needs.fetch_versions.outputs.pycopy).*.branch }}
-        port: [esp32]
-        include: ${{ fromJson(needs.fetch_versions.outputs.pycopy) }}
+      matrix: ${{ fromJson(needs.fetch_versions.outputs.pycopy) }}
+
     steps:
       - uses: actions/checkout@v2
         with:

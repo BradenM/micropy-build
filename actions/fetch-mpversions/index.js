@@ -7,10 +7,13 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const atob = require("atob");
 const take = require("lodash").take;
+const get = require("lodash").get;
+const mapValues = require("lodash").mapValues;
 
 const INPUTS = {
   GIT_TOKEN: "token",
   MAX_COUNT: "max-count",
+  BUILDS: "builds",
 };
 
 const versReg = /^v?(\d+\.)?(\d+\.)?(\*|\d+)$/;
@@ -70,13 +73,21 @@ const getIDFHash = async ({ repo, version, octokit }) => {
   return hash;
 };
 
+const parseBuilds = (rawBuilds) => {
+  const firms = rawBuilds.split(",");
+  const entries = firms.map((f) => {
+    const [name, portsRaw] = f.split("|");
+    const ports = portsRaw.split(":");
+    return [name, ports];
+  });
+  return Object.fromEntries(entries);
+};
+
 const run = async () => {
   try {
-    core.setCommandEcho(true)
+    core.setCommandEcho(true);
     const gitToken =
       core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
-    const ports = core.getInput('ports')
-    core.info('ports: ' + ports)
     const octokit = github.getOctokit(gitToken);
     core.startGroup("Fetch Versions");
     const maxCount = core.getInput(INPUTS.MAX_COUNT) || 1;
@@ -103,14 +114,23 @@ const run = async () => {
       })
     );
     core.endGroup();
-    core.setOutput("micropython", {
-      name: ['micropython'],
-      repo: ['https://github.com/micropython/micropython.git'],
-      branch: buildVersions.micropython.map((i) => i.branch),
-      port: ['esp32'],
-      include: buildVersions.micropython,
-    })
+    core.startGroup("Generate Matrices");
+    const builds = parseBuilds(
+      core.getInput(INPUTS.BUILDS) || "micropython|esp32"
+    );
+    core.info("parsed builds: " + builds);
 
+    const matrixes = {};
+    Object.keys(buildVersions).map((k) => {
+      const _repo = REPOS.find((r) => r.repo === k);
+      matrixes[k] = {
+        name: [builds[k]],
+        repo: [`https://github.com/${_repo.owner}/${_repo.repo}.git`],
+        branch: buildVersions[k].map((i) => i.branch),
+        include: buildVersions[k],
+      };
+    });
+    Object.keys(matrixes).map((k) => core.setOutput(k, matrixes[k]));
     core.setOutput("versions", buildVersions);
     core.info("Versions: " + JSON.stringify(buildVersions));
   } catch (error) {
@@ -123,4 +143,5 @@ run();
 module.exports = {
   getVersionsFromTags,
   getRecentVersions,
+  parseBuilds,
 };

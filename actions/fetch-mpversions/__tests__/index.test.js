@@ -92,4 +92,26 @@ describe("main", () => {
       ]
     `);
   });
+
+  it("parses build definition", () => {
+    const builds =
+      "micropython|esp32:esp8266,pycopy|someboard:anotherboard:coolboard,firmware|b1:b2";
+    expect(main.parseBuilds(builds)).toMatchInlineSnapshot(`
+      Object {
+        "firmware": Array [
+          "b1",
+          "b2",
+        ],
+        "micropython": Array [
+          "esp32",
+          "esp8266",
+        ],
+        "pycopy": Array [
+          "someboard",
+          "anotherboard",
+          "coolboard",
+        ],
+      }
+    `);
+  });
 });
