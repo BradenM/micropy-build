@@ -49,7 +49,7 @@ jobs:
         repo: ["https://github.com/micropython/micropython.git"]
         branch: ${{ needs.fetch_versions.outputs.micropython.*.ref }}
         port: [esp32]
-        include: ${{ fromJson(needs.fetch_versions.outputs.micropython) }}
+        include: ${{ needs.fetch_versions.outputs.micropython }}
 
     steps:
       - uses: actions/checkout@v2
@@ -102,7 +102,7 @@ jobs:
         repo: ["https://github.com/pfalcon/pycopy.git"]
         branch: ${{ needs.fetch_versions.outputs.pycopy.*.ref }}
         port: [esp32]
-        include: ${{ fromJson(needs.fetch_versions.outputs.pycopy) }}
+        include: ${{ needs.fetch_versions.outputs.pycopy }}
     steps:
       - uses: actions/checkout@v2
         with:

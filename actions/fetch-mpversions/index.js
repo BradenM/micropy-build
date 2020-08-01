@@ -72,7 +72,7 @@ const getIDFHash = async ({ repo, version, octokit }) => {
 
 const run = async () => {
   try {
-    const gitToken = core.getInput(INPUTS.GIT_TOKEN);
+    const gitToken = core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
     const octokit = github.getOctokit(gitToken);
     core.startGroup("Fetch Versions");
     const maxCount = core.getInput(INPUTS.MAX_COUNT) || 1;
@@ -99,8 +99,7 @@ const run = async () => {
       })
     );
     core.endGroup();
-    core.info("Repository tags:", repoTags);
-    core.info(buildVersions);
+    core.info("Versions: " + JSON.stringify(buildVersions));
     core.setOutput("versions", buildVersions);
   } catch (error) {
     core.setFailed(error.message);
