@@ -9,7 +9,7 @@ const atob = require("atob");
 const take = require("lodash").take;
 
 const INPUTS = {
-  GIT_TOKEN: "git-token",
+  GIT_TOKEN: "github-token",
   MAX_COUNT: "max-count",
 };
 
@@ -72,8 +72,7 @@ const getIDFHash = async ({ repo, version, octokit }) => {
 
 const run = async () => {
   try {
-    const gitToken =
-      core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
+    const gitToken = core.getInput(INPUTS.GIT_TOKEN);
     const octokit = github.getOctokit(gitToken);
     core.startGroup("Fetch Versions");
     const maxCount = core.getInput(INPUTS.MAX_COUNT) || 1;
