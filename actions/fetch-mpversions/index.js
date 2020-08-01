@@ -124,7 +124,8 @@ const run = async () => {
     Object.keys(buildVersions).map((k) => {
       const _repo = REPOS.find((r) => r.repo === k);
       matrixes[k] = {
-        name: [builds[k]],
+        name: [k],
+        ports: builds[k],
         repo: [`https://github.com/${_repo.owner}/${_repo.repo}.git`],
         branch: buildVersions[k].map((i) => i.branch),
         include: buildVersions[k],
