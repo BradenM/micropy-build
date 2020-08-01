@@ -1,0 +1,17 @@
+name: 'Fetch Micropython Versions'
+author: 'BradenM'
+description: 'Build and Publish Micropython Port'
+inputs:
+  github-token:
+    description: 'Github Token'
+    required: true
+  max-count: 
+    description: 'Max # of versions to fetch'
+    required: false
+    default: '1'
+outputs:
+  versions:
+    description: 'List of versions'
+runs:
+  using: "node12"
+  main: "dist/index.js"
