@@ -2,7 +2,7 @@ name: 'Fetch Micropython Versions'
 author: 'BradenM'
 description: 'Build and Publish Micropython Port'
 inputs:
-  github-token:
+  token:
     description: 'Github Token'
     required: true
   max-count: 

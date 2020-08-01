@@ -176,7 +176,7 @@ const atob = __webpack_require__(995);
 const take = __webpack_require__(557).take;
 
 const INPUTS = {
-  GIT_TOKEN: "git-token",
+  GIT_TOKEN: "token",
   MAX_COUNT: "max-count",
 };
 
@@ -239,8 +239,7 @@ const getIDFHash = async ({ repo, version, octokit }) => {
 
 const run = async () => {
   try {
-    const gitToken =
-      core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
+    const gitToken = core.getInput(INPUTS.GIT_TOKEN);
     const octokit = github.getOctokit(gitToken);
     core.startGroup("Fetch Versions");
     const maxCount = core.getInput(INPUTS.MAX_COUNT) || 1;
@@ -259,7 +258,7 @@ const run = async () => {
               octokit,
             });
             buildVersions[rt.repo].push({
-              ref: v.name,
+              branch: v.name,
               idf: hash,
             });
           })

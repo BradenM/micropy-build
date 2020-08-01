@@ -9,7 +9,7 @@ const atob = require("atob");
 const take = require("lodash").take;
 
 const INPUTS = {
-  GIT_TOKEN: "github-token",
+  GIT_TOKEN: "token",
   MAX_COUNT: "max-count",
 };
 

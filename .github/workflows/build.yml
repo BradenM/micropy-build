@@ -35,7 +35,7 @@ jobs:
         id: fetch
         uses: ./actions/fetch-mpversions
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GIT_PAT }}
           max-count: 1
 
   build_micropython:
