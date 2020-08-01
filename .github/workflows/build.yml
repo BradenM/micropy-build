@@ -49,9 +49,7 @@ jobs:
         repo: ["https://github.com/micropython/micropython.git"]
         branch: ${{ needs.fetch_versions.outputs.micropython.*.ref }}
         port: [esp32]
-        include:
-          - branch: ${{ needs.fetch_versions.outputs.micropython.0.ref }}
-            idf: ${{ needs.fetch_versions.outputs.micropython.0.idf }} 
+        include: ${{ fromJson(needs.fetch_versions.outputs.micropython) }}
 
     steps:
       - uses: actions/checkout@v2
