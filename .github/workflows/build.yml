@@ -35,7 +35,7 @@ jobs:
         id: fetch
         uses: ./actions/fetch-mpversions
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           max-count: 1
 
   build_micropython:
@@ -68,7 +68,7 @@ jobs:
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
           context: .
           dockerfile: esp32/Dockerfile
-          push_image_and_stages: 'on:push'
+          push_image_and_stages: "on:push"
 
       - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
@@ -94,16 +94,15 @@ jobs:
   build_pycopy:
     name: Build Pycopy
     runs-on: ubuntu-latest
+    needs: fetch_versions
     strategy:
       fail-fast: false
       matrix:
         name: [pycopy]
         repo: ["https://github.com/pfalcon/pycopy.git"]
-        branch: [v3.2.4]
+        branch: ${{ needs.fetch_versions.outputs.pycopy.*.ref }}
         port: [esp32]
-        include:
-          - branch: v3.2.4
-            idf: 4c81978a3e2220674a432a588292a4c860eef27b
+        include: ${{ fromJson(needs.fetch_versions.outputs.pycopy) }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -121,7 +120,7 @@ jobs:
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
           context: .
           dockerfile: esp32/Dockerfile
-          push_image_and_stages: 'on:push'
+          push_image_and_stages: "on:push"
 
       - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
