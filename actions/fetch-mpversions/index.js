@@ -92,7 +92,7 @@ const run = async () => {
               octokit,
             });
             buildVersions[rt.repo].push({
-              ref: v.name,
+              branch: v.name,
               idf: hash,
             });
           })
