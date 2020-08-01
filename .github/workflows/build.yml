@@ -40,7 +40,7 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           max-count: 1
-          builds: "micropython|esp32,pycopy|esp32"
+          builds: "micropython|esp32:esp8266:unix,pycopy|esp32"
 
   build_micropython:
     name: Build MicroPython
