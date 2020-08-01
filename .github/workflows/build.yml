@@ -21,19 +21,37 @@ on:
       - "actions/**/*"
 
 jobs:
+  fetch_versions:
+    name: Fetch Latest Versions
+    runs-on: ubuntu-latest
+    outputs:
+      micropython: ${{ steps.fetch.outputs.versions.micropython }}
+      pycopy: ${{ steps.fetch.outputs.versions.pycopy }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fetch Recent Versions
+        id: fetch
+        uses: ./actions/fetch-mpversions
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          max-count: 1
+
   build_micropython:
     name: Build MicroPython
     runs-on: ubuntu-latest
+    needs: fetch_versions
     strategy:
       fail-fast: false
       matrix:
         name: [micropython]
         repo: ["https://github.com/micropython/micropython.git"]
-        branch: [v1.12]
+        branch: ${{ needs.fetch_versions.outputs.micropython.*.ref }}
         port: [esp32]
         include:
-          - branch: v1.12
-            idf: 310beae373446ceb9a4ad9b36b5428d7fdf2705f
+          - branch: ${{ needs.fetch_versions.outputs.micropython.0.ref }}
+            idf: ${{ needs.fetch_versions.outputs.micropython.0.idf }} 
 
     steps:
       - uses: actions/checkout@v2
@@ -52,6 +70,7 @@ jobs:
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
           context: .
           dockerfile: esp32/Dockerfile
+          push_image_and_stages: 'on:push'
 
       - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
@@ -104,6 +123,7 @@ jobs:
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
           context: .
           dockerfile: esp32/Dockerfile
+          push_image_and_stages: 'on:push'
 
       - name: Build ${{ matrix.name }} ${{ matrix.port }} ${{ matrix.branch }}
         id: micropy-build
@@ -125,7 +145,6 @@ jobs:
         with:
           name: ${{ steps.micropy-build.outputs.binaries }}
           path: ./${{ steps.micropy-build.outputs.binaries }}
-
   # build_pycom:
   #   name: Build Pycom
   #   runs-on: ubuntu-latest
