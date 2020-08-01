@@ -1,0 +1,27 @@
+{
+  "name": "fetch-mpversions",
+  "version": "1.0.0",
+  "description": "Fetch MicroPython versions",
+  "main": "index.js",
+  "author": "BradenM <bradenmars@bradenmars.me>",
+  "license": "MIT",
+  "scripts": {
+    "build": "ncc build index.js",
+    "fetch": "yarn build && node dist/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.4",
+    "@actions/github": "^4.0.0",
+    "atob": "^2.1.2",
+    "lodash": "^4.17.19"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@zeit/ncc": "^0.22.3",
+    "babel-jest": "^26.2.2",
+    "jest": "^26.2.2",
+    "prettier": "^2.0.5"
+  }
+}
