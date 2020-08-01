@@ -9,9 +9,14 @@ inputs:
     description: 'Max # of versions to fetch'
     required: false
     default: '1'
+  ports:
+    description: 'Ports to build for'
+    required: true
 outputs:
   versions:
     description: 'List of versions'
+  micropython:
+    description: 'mp'
 runs:
   using: "node12"
   main: "dist/index.js"

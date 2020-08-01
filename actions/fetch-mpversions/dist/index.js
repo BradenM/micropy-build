@@ -239,7 +239,11 @@ const getIDFHash = async ({ repo, version, octokit }) => {
 
 const run = async () => {
   try {
-    const gitToken = core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
+    core.setCommandEcho(true)
+    const gitToken =
+      core.getInput(INPUTS.GIT_TOKEN) || process.env.GITHUB_TOKEN;
+    const ports = core.getInput('ports')
+    core.info('ports: ' + ports)
     const octokit = github.getOctokit(gitToken);
     core.startGroup("Fetch Versions");
     const maxCount = core.getInput(INPUTS.MAX_COUNT) || 1;
@@ -266,8 +270,16 @@ const run = async () => {
       })
     );
     core.endGroup();
-    core.info("Versions: " + JSON.stringify(buildVersions));
+    core.setOutput("micropython", {
+      name: ['micropython'],
+      repo: ['https://github.com/micropython/micropython.git'],
+      branch: buildVersions.micropython.map((i) => i.branch),
+      port: ['esp32'],
+      include: buildVersions.micropython,
+    })
+
     core.setOutput("versions", buildVersions);
+    core.info("Versions: " + JSON.stringify(buildVersions));
   } catch (error) {
     core.setFailed(error.message);
   }

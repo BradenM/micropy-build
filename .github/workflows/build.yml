@@ -25,8 +25,8 @@ jobs:
     name: Fetch Latest Versions
     runs-on: ubuntu-latest
     outputs:
-      micropython: ${{ steps.fetch.outputs.versions.micropython }}
-      pycopy: ${{ steps.fetch.outputs.versions.pycopy }}
+      versions: ${{ steps.fetch.outputs.versions }}
+      micropython: ${{steps.fetch.outputs.micropython}}
 
     steps:
       - uses: actions/checkout@v2
@@ -37,6 +37,11 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           max-count: 1
+          ports:
+            micropython:
+              - esp32
+            pycopy:
+              - esp32
 
   build_micropython:
     name: Build MicroPython
@@ -44,12 +49,7 @@ jobs:
     needs: fetch_versions
     strategy:
       fail-fast: false
-      matrix:
-        name: [micropython]
-        repo: ["https://github.com/micropython/micropython.git"]
-        branch: ${{ needs.fetch_versions.outputs.micropython.*.ref }}
-        port: [esp32]
-        include: ${{ needs.fetch_versions.outputs.micropython }}
+      matrix: ${{ fromJson(needs.fetch_versions.outputs.micropython) }}
 
     steps:
       - uses: actions/checkout@v2
@@ -100,9 +100,9 @@ jobs:
       matrix:
         name: [pycopy]
         repo: ["https://github.com/pfalcon/pycopy.git"]
-        branch: ${{ needs.fetch_versions.outputs.pycopy.*.ref }}
+        branch: ${{ fromJson(needs.fetch_versions.outputs.pycopy).*.branch }}
         port: [esp32]
-        include: ${{ needs.fetch_versions.outputs.pycopy }}
+        include: ${{ fromJson(needs.fetch_versions.outputs.pycopy) }}
     steps:
       - uses: actions/checkout@v2
         with:
