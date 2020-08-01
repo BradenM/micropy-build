@@ -28,12 +28,14 @@ RUN apt-get clean \
 # Python Reqs
 RUN pip3 install pyserial pyparsing==2.3.1
 
+SHELL ["/bin/bash", "-c"]
+
 # Fetch and Setup Repos
 RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
     && git clone $REPO micropython \
     && cd esp-idf && git checkout $IDF && git submodule update --init --recursive\
     # @see https://github.com/pfalcon/pycopy/issues/48
-    && if [[ $REPO == *"pycopy"* ]]; then (cd esp-idf/components/mbedtls/; rm -rf mbedtls; git clone -b mbedtls-2.16.5-idf-pycopy https://github.com/pfalcon/mbedtls/); fi\
+    && if [[ $REPO == *"pycopy"* ]]; then (cd components/mbedtls/; rm -rf mbedtls; git clone -b mbedtls-2.16.5-idf-pycopy https://github.com/pfalcon/mbedtls/; cd mbedtls; git log -n1; cd ../../../); fi\
     && cd .. && cd micropython && git checkout $BRANCH && git pull origin $BRANCH\
     && chown -R micropython:micropython ../esp-idf ../micropython ../esp
 
@@ -81,6 +83,7 @@ USER root
 # Build ESP32 (Support Pycom Params)
 RUN cd /micropython/${PORT_PATH}\
     && if [ "$BOARD" != "GENERIC" ]; then make -j5 BOARD=${BOARD} TARGET=boot\
+    && if [[ $REPO == *"pycopy"* ]]; then make submodules ; fi\
     && make -j5 BOARD=${BOARD} TARGET=app;\
     else make; fi
 
