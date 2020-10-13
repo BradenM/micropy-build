@@ -2,3 +2,7 @@
 .pytest_cache
 .mypy_cache
 actions/fetch-mpversions/node_modules
+modules/
+!modules/.gitkeep
+.idea
+.envrc

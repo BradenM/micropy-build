@@ -15,6 +15,7 @@ import argparse
 import os
 import shutil
 from pathlib import Path
+import subprocess as subproc
 
 # Micropython Firmware Repo Path
 MICROPY_ROOT = Path("/micropython")
@@ -25,6 +26,12 @@ MICROPY_NAME = os.environ.get("INPUT_NAME", "micropython")
 PORT = os.environ.get("INPUT_PORT", "esp32")
 PORT_ROOT = os.environ.get("INPUT_PORT_ROOT", (MICROPY_ROOT / "ports"))
 PORT_PATH = Path(PORT_ROOT) / PORT
+
+# Board Settings
+BOARD = os.environ.get("INPUT_BOARD", "GENERIC")
+
+# Extra Modules
+EXTRA_MODULES_PATH = Path("/pymodules")
 
 
 def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
@@ -48,10 +55,38 @@ def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
     print("Done!")
 
 
-if __name__ == '__main__':
+def load_extra_modules():
+    for module_path in EXTRA_MODULES_PATH.iterdir():
+        dest = PORT_PATH / "modules" / module_path.name
+        shutil.rmtree(dest, ignore_errors=True)
+        print(f"Copying: {module_path.name} => {dest}")
+        if(module_path.is_dir()):
+            shutil.copytree(str(module_path), str(dest))
+        else:
+            shutil.copy2(str(module_path), str(dest))
+    print("Extra frozen modules copied!")
+
+
+def exec_cmd(*args):
+    print('Executing:', *args)
+    proc = subproc.run(args)
+    proc.check_returncode()
+
+
+def build(do_copy=True, **kwargs):
+    print("Building Port!")
+    load_extra_modules()
+    exec_cmd("make", "-j4", "-C", str(PORT_PATH),
+             f"BOARD={BOARD}", "TARGET=app")
+    print('Done!')
+    if do_copy:
+        copy_artifacts('/artifacts')
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Micropy-Build Docker Entrypoint.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.set_defaults(func=None)
     subparsers = parser.add_subparsers(help="Command to execute.")
@@ -59,16 +94,23 @@ if __name__ == '__main__':
     cp_parser = subparsers.add_parser(
         "copy",
         help="Copy build Artifacts",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     cp_parser.add_argument(
-        '-d', '--dest', help="Path to copy artifacts to.",
-        default="/artifacts")
+        "-d", "--dest", help="Path to copy artifacts to.", default="/artifacts"
+    )
     cp_parser.add_argument(
-        '-b', '--binary',
-        help='Name of Binary Executable to Look for.',
-        default=MICROPY_NAME)
+        "-b",
+        "--binary",
+        help="Name of Binary Executable to Look for.",
+        default=MICROPY_NAME,
+    )
     cp_parser.set_defaults(func=copy_artifacts)
+
+    build_parser = subparsers.add_parser(
+        "build", help="Rebuild a port.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    build_parser.add_argument('-c', '--copy', help="Perform Copy after building.", default=True)
+    build_parser.set_defaults(func=build)
 
     args = parser.parse_args()
     if not args.func:
