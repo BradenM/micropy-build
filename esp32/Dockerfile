@@ -80,19 +80,24 @@ ENV BRANCH ${BRANCH:-master}
 
 USER root
 
-# Build ESP32 (Support Pycom Params)
-RUN cd /micropython/${PORT_PATH}\
-    && if [ "$BOARD" != "GENERIC" ]; then make -j5 BOARD=${BOARD} TARGET=boot\
-    && if [[ $REPO == *"pycopy"* ]]; then make submodules ; fi\
-    && make -j5 BOARD=${BOARD} TARGET=app;\
-    else make; fi
-
-RUN mkdir /mnt/dev
-ENV PATH=/micropython/mpy-cross:$PATH
-
+# Copy Modules
+COPY ./modules /pymodules
 
 # Setup Entrypoint
 # Must copy entrypoint or build from parent dir with -f option
 COPY ./docker-entrypoint.py /docker-entrypoint.py
+
+
+# Build ESP32 (Support Pycom Params)
+RUN cd /micropython/${PORT_PATH}\
+    && ls modules\
+    && if [[ $REPO == *"pycopy"* ]]; then make submodules ; fi\
+    && if [ "$BOARD" != "GENERIC" ]; then make -j4 BOARD=${BOARD} TARGET=boot\
+    && make -j4 BOARD=${BOARD} TARGET=app;\
+    else /usr/bin/python3 /docker-entrypoint.py build; fi
+
+RUN mkdir /mnt/dev
+ENV PATH=/micropython/mpy-cross:$PATH
+
 
 ENTRYPOINT ["/usr/bin/python3", "/docker-entrypoint.py"]
