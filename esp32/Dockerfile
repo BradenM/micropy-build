@@ -4,6 +4,7 @@ FROM python:3.7-slim as builder
 
 LABEL maintainer="bradenmars@bradenmars.me"
 LABEL description="MicroPython ESP32 Build Dockerfile"
+LABEL org.opencontainers.image.source https://github.com/bradenm/micropy-build
 
 # Allow Args to Override Env
 ARG REPO

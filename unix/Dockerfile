@@ -2,6 +2,7 @@ FROM ubuntu:18.04
 
 LABEL maintainer="bradenmars@bradenmars.me"
 LABEL description="MicroPython Unix Dockerfile"
+LABEL org.opencontainers.image.source https://github.com/bradenm/micropy-build
 
 ARG REPO=https://github.com/micropython/micropython.git
 ARG BRANCH=master
