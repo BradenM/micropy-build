@@ -108,8 +108,8 @@ jobs:
         uses: whoan/docker-build-with-cache-action@master
         with:
           username: bradenm
-          password: "${{ secrets.GITHUB_TOKEN }}"
-          registry: docker.pkg.github.com
+          password: "${{ secrets.GIT_PAT }}"
+          registry: ghcr.io
           image_name: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
           image_tag: latest
           build_extra_args: "--compress=true --target toolkit --build-arg=REPO=${{ matrix.repo }} --build-arg=BRANCH=${{ matrix.branch }} --build-arg=IDF=${{ matrix.idf }}"
