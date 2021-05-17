@@ -7,8 +7,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const atob = require("atob");
 const take = require("lodash").take;
-const get = require("lodash").get;
-const mapValues = require("lodash").mapValues;
 
 const INPUTS = {
   GIT_TOKEN: "token",
@@ -31,7 +29,7 @@ const REPOS = [
 
 const getVersionsFromTags = async ({ repo, octokit, count }) => {
   core.info(`Fetching tags from: ${repo.owner}/${repo.repo}`);
-  const repoTags = await octokit.repos.listTags({
+  const repoTags = await octokit.rest.repos.listTags({
     ...repo,
     per_page: 5,
   });
@@ -58,7 +56,7 @@ const getRecentVersions = async (repos, octokit, count = 1) =>
 
 const getIDFHash = async ({ repo, version, octokit }) => {
   core.info(`Retrieving ESP-IDF hash for ${repo.repo} @ ${version}`);
-  const response = await octokit.repos.getContent({
+  const response = await octokit.rest.repos.getContent({
     ...repo,
     path: "ports/esp32/Makefile",
     ref: version,
