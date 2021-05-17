@@ -59,13 +59,13 @@ RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
         components/esptool_py/esptool \
         components/lwip/lwip \
         components/mbedtls/mbedtls \
+    && ./install.sh \
     # @see https://github.com/pfalcon/pycopy/issues/48
     && if [[ $REPO == *"pycopy"* ]]; then (cd components/mbedtls/; rm -rf mbedtls; git clone -b mbedtls-2.16.5-idf-pycopy https://github.com/pfalcon/mbedtls/; cd mbedtls; git log -n1; cd ../../../); fi\
     && cd .. && cd micropython && git checkout $BRANCH && git pull origin $BRANCH\
     && chown -R micropython:micropython ../esp-idf ../micropython ../esp
 
 
-ARG BOARD
 FROM builder as toolkit
 
 ARG NUM_PROC
