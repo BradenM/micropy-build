@@ -100,14 +100,18 @@ const run = async () => {
         buildVersions[rt.repo] = [];
         await Promise.all(
           rt.versions.map(async (v) => {
-            const hash = await getIDFHash({
-              repo: { owner: rt.owner, repo: rt.repo },
-              version: v.name,
-              octokit,
-            });
+            // const hash = await getIDFHash({
+            //   repo: { owner: rt.owner, repo: rt.repo },
+            //   version: v.name,
+            //   octokit,
+            // });
+            // TODO: micropython no longer specifies
+            // a commit hash in the makefile.
+            // Determine how to auto-determine
+            // the latest compat versions.
             buildVersions[rt.repo].push({
               branch: v.name,
-              idf: hash,
+              idf: "v4.1.1",
             });
           })
         );
