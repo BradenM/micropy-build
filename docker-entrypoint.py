@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """micropy-build
 
@@ -14,8 +13,9 @@ Braden Mars
 import argparse
 import os
 import shutil
-from pathlib import Path
 import subprocess as subproc
+from pathlib import Path
+from typing import Sequence
 
 # Micropython Firmware Repo Path
 MICROPY_ROOT = Path("/micropython")
@@ -34,6 +34,13 @@ BOARD = os.environ.get("INPUT_BOARD", "GENERIC")
 EXTRA_MODULES_PATH = Path("/pymodules")
 
 
+def rglob_binaries(path: Path, glob: str, exclusions: Sequence[str]):
+    files = path.rglob(glob)
+    for f in files:
+        if not any(set(f.parts) & set(exclusions)):
+            yield f
+
+
 def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
     """Find and copy build artifacts to path
 
@@ -46,8 +53,9 @@ def copy_artifacts(dest, binary=MICROPY_NAME, **kwargs):
     print("[DEBUG] Binary Name:", binary)
     dest = Path(dest).absolute()
     dest.mkdir(exist_ok=True, parents=True)
-    binaries = list(PORT_PATH.rglob("*.bin"))
-    binaries.extend(list(PORT_PATH.rglob(binary)))
+    exclusions = ('CMakeFiles', 'bootloader', 'partition_table', 'esp-idf',)
+    binaries = list(rglob_binaries(PORT_PATH, "*.bin", exclusions))
+    binaries.extend(list(rglob_binaries(PORT_PATH, binary, exclusions)))
     print("\n[Found Artifacts]\n", "\n".join(str(p) for p in binaries), "\n")
     for f in binaries:
         f_dest = shutil.copy2(f, dest)
