@@ -20,7 +20,23 @@ ENV IDF_REPO ${IDF_REPO:-https://github.com/espressif/esp-idf.git}
 
 # Requirements
 RUN apt-get update \
-    && apt-get install -y gcc git wget make libncurses-dev flex bison gperf python3 python3-pip python-setuptools python-serial python-cryptography python-future python-pyelftools
+    && apt-get install -y \
+    gcc \
+    git \
+    wget \
+    make \
+    cmake \
+    libncurses-dev \
+    flex \
+    bison \
+    gperf \
+    python3 \
+    python3-pip \
+    python-setuptools \
+    python-serial \
+    python-cryptography \
+    python-future \
+    python-pyelftools
 
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -34,14 +50,27 @@ SHELL ["/bin/bash", "-c"]
 # Fetch and Setup Repos
 RUN mkdir -p esp && git clone $IDF_REPO esp-idf \
     && git clone $REPO micropython \
-    && cd esp-idf && git checkout $IDF && git submodule update --init --recursive\
+    && cd esp-idf \
+    && git checkout $IDF \
+    && git submodule update --init \
+        components/bt/controller/lib \
+        components/bt/host/nimble/nimble \
+        components/esp_wifi \
+        components/esptool_py/esptool \
+        components/lwip/lwip \
+        components/mbedtls/mbedtls \
     # @see https://github.com/pfalcon/pycopy/issues/48
     && if [[ $REPO == *"pycopy"* ]]; then (cd components/mbedtls/; rm -rf mbedtls; git clone -b mbedtls-2.16.5-idf-pycopy https://github.com/pfalcon/mbedtls/; cd mbedtls; git log -n1; cd ../../../); fi\
     && cd .. && cd micropython && git checkout $BRANCH && git pull origin $BRANCH\
     && chown -R micropython:micropython ../esp-idf ../micropython ../esp
 
 
+ARG BOARD
 FROM builder as toolkit
+
+ARG NUM_PROC
+
+ENV NUM_PROC ${NUM_PROC:-4}
 
 # Post-build Helpers
 RUN apt-get update \
@@ -56,13 +85,8 @@ ENV ESPIDF=/esp-idf
 ENV IDF_PATH=/esp-idf
 
 # Build Mpy Cross & ESP32 Toolkit
-RUN cd micropython && make -C mpy-cross
+RUN cd micropython && make -j"$NUM_PROC" -C mpy-cross
 RUN cd micropython && git submodule init lib/berkeley-db-1.xx && git submodule update
-
-RUN cd esp && wget https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-98-g4638c4f-5.2.0-20190827.tar.gz
-RUN cd esp && mkdir xtensa-esp32-elf\
-    && tar -xzf ./xtensa-esp32-elf-linux64-1.22.0-98-g4638c4f-5.2.0-20190827.tar.gz -C ./xtensa-esp32-elf
-ENV PATH=/esp/xtensa-esp32-elf/xtensa-esp32-elf/bin:$PATH
 
 ENTRYPOINT [ "/bin/bash" ]
 
@@ -73,11 +97,13 @@ FROM toolkit as mpbuild
 ARG PORT_PATH
 ARG BOARD
 ARG BRANCH
+ARG NUM_PROC
 
 # Environment
 ENV PORT_PATH ${PORT_PATH:-ports/esp32}
 ENV BOARD ${BOARD:-GENERIC}
 ENV BRANCH ${BRANCH:-master}
+ENV NUM_PROC ${NUM_PROC:-4}
 
 USER root
 
@@ -92,9 +118,10 @@ COPY ./docker-entrypoint.py /docker-entrypoint.py
 # Build ESP32 (Support Pycom Params)
 RUN cd /micropython/${PORT_PATH}\
     && ls modules\
-    && if [[ $REPO == *"pycopy"* ]]; then make submodules ; fi\
-    && if [ "$BOARD" != "GENERIC" ]; then make -j4 BOARD=${BOARD} TARGET=boot\
-    && make -j4 BOARD=${BOARD} TARGET=app;\
+    && source /esp-idf/export.sh \
+    && if [[ $REPO == *"pycopy"* ]]; then make -j"$NUM_PROC" submodules ; fi\
+    && if [ "$BOARD" != "GENERIC" ]; then make -j"$NUM_PROC" BOARD=${BOARD} TARGET=boot\
+    && make -j"$NUM_PROC" BOARD=${BOARD} TARGET=app;\
     else /usr/bin/python3 /docker-entrypoint.py build; fi
 
 RUN mkdir /mnt/dev
