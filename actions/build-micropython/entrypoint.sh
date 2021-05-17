@@ -16,6 +16,14 @@ DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}-${BOARD_NAME}:${BRANCH}"
 DOCKER_BASE_IMAGE="${DOCKER_ROOT}/${INPUT_BASE_IMAGE}-stages"
 CONTAINER="$INPUT_NAME"
 
+# Get proc count.
+if which nproc > /dev/null; then
+    NUM_PROC="$(nproc)"
+else
+    NUM_PROC="4"
+fi
+
+
 # Docker Authenticate
 sh -c "docker login ${INPUT_DOCKER_REGISTRY} -u ${INPUT_DOCKER_USERNAME} -p ${INPUT_DOCKER_PASSWORD}"
 
@@ -51,7 +59,8 @@ docker build \
     --build-arg IDF="${IDF}" \
     --build-arg IDF_REPO="${IDF_REPO}" \
     --build-arg PORT_PATH="${PORT_PATH}" \
-    --build-arg BOARD="${BOARD}"
+    --build-arg BOARD="${BOARD}" \
+    --build-arg NUM_PROC="${NUM_PROC}"
 
 # Gather Compiled Artifacts
 sh -c "docker run --name ${CONTAINER} -i ${DOCKER_TAG} copy"
