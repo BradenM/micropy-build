@@ -1,6 +1,7 @@
 name: Build Ports
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "0 12 1-31/2 * *"
   push:
