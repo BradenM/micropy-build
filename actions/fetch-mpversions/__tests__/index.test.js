@@ -29,10 +29,11 @@ describe("main", () => {
 
   beforeEach(() => {
     octokit = jest.fn();
-    octokit.repos = jest.fn();
+    octokit.rest = jest.fn()
+    octokit.rest.repos = jest.fn();
     github.getOctokit.mockReturnValue(octokit);
-    octokit.repos.listTags = jest.fn();
-    octokit.repos.listTags.mockResolvedValue({
+    octokit.rest.repos.listTags = jest.fn();
+    octokit.rest.repos.listTags.mockResolvedValue({
       data: [
         ...mockTags.data,
         {
@@ -48,7 +49,7 @@ describe("main", () => {
 
   it("retrieves valid versions from tags", async () => {
     const tags = await main.getVersionsFromTags({ repo: mockRepo, octokit });
-    expect(octokit.repos.listTags.mock.calls).toMatchInlineSnapshot(`
+    expect(octokit.rest.repos.listTags.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
           Object {
