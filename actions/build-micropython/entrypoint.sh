@@ -11,7 +11,7 @@ BOARD_NAME="$(if [ "$BOARD" != 'GENERIC' ]; then echo "$BOARD" | tr '[:upper:]' 
 PORT_PATH="${INPUT_PORT_ROOT}/${INPUT_PORT}"
 
 # Image Info
-DOCKER_ROOT="docker.pkg.github.com/bradenm/micropy-build"
+DOCKER_ROOT="ghcr.io/bradenm/micropy-build"
 DOCKER_TAG="${DOCKER_ROOT}/${FIRMWARE_NAME}-${BOARD_NAME}:${BRANCH}"
 DOCKER_BASE_IMAGE="${DOCKER_ROOT}/${INPUT_BASE_IMAGE}-stages"
 CONTAINER="$INPUT_NAME"

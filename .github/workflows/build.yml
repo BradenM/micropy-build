@@ -81,7 +81,7 @@ jobs:
           port: ${{ matrix.port }}
           path: ./${{ matrix.port }}
           base_image: ${{ matrix.name }}-${{ matrix.port }}-${{ matrix.branch }}-base
-          docker_registry: docker.pkg.github.com
+          docker_registry: ghcr.io
           docker_username: ${{ secrets.REGISTRY_USERNAME }}
           docker_password: ${{ secrets.REGISTRY_PASSWORD }}
 
